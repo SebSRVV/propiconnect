@@ -2,11 +2,19 @@
 
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 
+function useIsClient() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
+  return isClient;
+}
+
 export default function LoginPage() {
+  const isClient = useIsClient();
   const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,42 +39,44 @@ export default function LoginPage() {
     }
   };
 
+  if (!isClient) return null;
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Iniciar sesión</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8">
+        <h1 className="text-3xl font-bold text-center text-white mb-6">Iniciar sesión</h1>
 
-        {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-sm">{error}</div>}
+        {error && <div className="bg-red-200 text-red-800 p-2 rounded mb-4 text-sm">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex items-center border rounded px-3 py-2">
-            <FaEnvelope className="text-gray-400 mr-2" />
+        <form onSubmit={handleSubmit} className="space-y-4 text-gray-200">
+          <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+            <FaEnvelope className="text-gray-300 mr-2" />
             <input
               type="email"
               placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full focus:outline-none"
+              className="w-full bg-transparent text-white focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center border rounded px-3 py-2">
-            <FaLock className="text-gray-400 mr-2" />
+          <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+            <FaLock className="text-gray-300 mr-2" />
             <input
               type="password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full focus:outline-none"
+              className="w-full bg-transparent text-white focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition ${
+            className={`w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-500 transition ${
               loading ? 'opacity-60 cursor-not-allowed' : ''
             }`}
           >
@@ -74,9 +84,9 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-sm text-center text-gray-600 mt-6">
+        <p className="text-sm text-center text-gray-400 mt-6">
           ¿No tienes cuenta?{' '}
-          <a href="/register" className="text-blue-600 font-medium hover:underline">
+          <a href="/register" className="text-blue-400 font-medium hover:underline">
             Regístrate aquí
           </a>
         </p>
