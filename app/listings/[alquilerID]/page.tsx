@@ -5,9 +5,17 @@ import { FaMapMarkerAlt, FaMoneyBillWave, FaUser } from 'react-icons/fa';
 
 const prisma = new PrismaClient();
 
-export default async function PropertyDetailPage({ params }: { params: { alquilerID: string } }) {
+export default async function PropertyDetailPage({
+  params,
+}: {
+  params: { alquilerID: string };
+}) {
+  const alquilerID = Number(params.alquilerID);
+
+  if (isNaN(alquilerID)) return notFound();
+
   const alquiler = await prisma.alquiler.findUnique({
-    where: { alquilerID: Number(params.alquilerID) },
+    where: { alquilerID },
     include: { usuario: true },
   });
 
@@ -31,9 +39,14 @@ export default async function PropertyDetailPage({ params }: { params: { alquile
             <FaMapMarkerAlt /> {alquiler.direccion}
           </p>
           <p className="flex items-center gap-2 text-gray-300">
-            <FaMoneyBillWave /> <span className="text-lg font-bold text-green-400">S/.{alquiler.precio.toFixed(2)}</span>
+            <FaMoneyBillWave />{' '}
+            <span className="text-lg font-bold text-green-400">
+              S/.{alquiler.precio.toFixed(2)}
+            </span>
           </p>
-          <p className="text-gray-400">{alquiler.descripcion || 'Sin descripción.'}</p>
+          <p className="text-gray-400">
+            {alquiler.descripcion || 'Sin descripción.'}
+          </p>
           <p className="text-sm text-gray-500 flex items-center gap-2">
             <FaUser /> Publicado por: {alquiler.usuario?.name || 'Propietario'}
           </p>
