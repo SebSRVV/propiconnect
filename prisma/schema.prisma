@@ -7,104 +7,96 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model alquiler {
-  alquilerID        Int                         @id
-  categoria         alquiler_categoria
-  descripcion       String?                     @db.Text
-  direccion         String                      @db.VarChar(100)
-  precio            Float                       @db.Float
-  estadoPublicacion alquiler_estadoPublicacion? @default(Disponible)
-  ownerID           Int
-  usuario           usuario                     @relation(fields: [ownerID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "alquiler_ibfk_1")
-  renta             renta[]
-
-  @@index([ownerID], map: "alquiler_ibfk_1")
-}
-
 model credencial {
-  credencialID Int       @id
-  email        String?   @unique @db.VarChar(50)
-  password     String?   @db.VarChar(50)
-  usuario      usuario[]
-}
-
-model grupo_a_rentar {
-  grupoID           Int                 @id
-  nombre            String?             @db.VarChar(50)
-  descripcion       String?             @db.Text
-  fechaCreacion     DateTime?           @db.Date
-  renta             renta[]
-  usuario_por_grupo usuario_por_grupo[]
-}
-
-model pago {
-  pagoID       Int            @id
-  monto        Float?         @db.Float
-  metodoPago   String?        @db.VarChar(50)
-  fecha        DateTime?      @db.Date
-  estado       pago_estado?
-  rentalID     Int?
-  renta        renta?         @relation(fields: [rentalID], references: [rentalID], onDelete: NoAction, onUpdate: NoAction, map: "pago_ibfk_1")
-  pago_usuario pago_usuario[]
-
-  @@index([rentalID], map: "idx_pago_rentalID")
-}
-
-model pago_usuario {
-  pagoUsuarioID Int                  @id
-  userID        Int?
-  pagoID        Int?
-  monto         Float?               @db.Float
-  estado        pago_usuario_estado?
-  usuario       usuario?             @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "pago_usuario_ibfk_1")
-  pago          pago?                @relation(fields: [pagoID], references: [pagoID], onDelete: NoAction, onUpdate: NoAction, map: "pago_usuario_ibfk_2")
-
-  @@index([pagoID], map: "idx_pago_usuario_pagoID")
-  @@index([userID], map: "idx_pago_usuario_userID")
-}
-
-model renta {
-  rentalID       Int             @id
-  fechaInicio    DateTime?       @db.Date
-  fechaFin       DateTime?       @db.Date
-  estado         String?         @db.VarChar(50)
-  alquilerID     Int?
-  userID         Int?
-  grupoID        Int?
-  pago           pago[]
-  alquiler       alquiler?       @relation(fields: [alquilerID], references: [alquilerID], onDelete: NoAction, onUpdate: NoAction, map: "renta_ibfk_1")
-  usuario        usuario?        @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "renta_ibfk_2")
-  grupo_a_rentar grupo_a_rentar? @relation(fields: [grupoID], references: [grupoID], onDelete: NoAction, onUpdate: NoAction, map: "renta_ibfk_3")
-
-  @@index([alquilerID], map: "idx_renta_alquilerID")
-  @@index([grupoID], map: "idx_renta_grupoID")
-  @@index([userID], map: "idx_renta_userID")
+  credencialID Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  usuario      usuario?
 }
 
 model usuario {
-  userID            Int                 @id
-  nombres           String?             @db.VarChar(50)
-  apellidos         String?             @db.VarChar(50)
-  telefono          Int?
+  userID            Int                 @id @default(autoincrement())
+  nombres           String
+  apellidos         String
+  telefono          Int
   tipoUsuario       usuario_tipoUsuario
-  credencialID      Int?
-  alquiler          alquiler[]
-  pago_usuario      pago_usuario[]
-  renta             renta[]
-  credencial        credencial?         @relation(fields: [credencialID], references: [credencialID], onDelete: NoAction, onUpdate: NoAction, map: "usuario_ibfk_1")
-  usuario_por_grupo usuario_por_grupo[]
+  credencialID      Int                @unique
+  credencial        credencial         @relation(fields: [credencialID], references: [credencialID])
+  alquileres        alquiler[]         // Propiedades publicadas
+  rentas            renta[]            // Propiedades que renta
+  pagosUsuario      pago_usuario[]
+  usuarioPorGrupo   usuario_por_grupo[]
+}
 
-  @@index([credencialID], map: "usuario_ibfk_1")
+model alquiler {
+  alquilerID        Int                         @id @default(autoincrement())
+  categoria         alquiler_categoria
+  descripcion       String?
+  direccion         String
+  precio            Float
+  estadoPublicacion alquiler_estadoPublicacion @default(Disponible)
+  ownerID           Int
+  usuario           usuario                     @relation(fields: [ownerID], references: [userID])
+  rentas            renta[]
+}
+
+model renta {
+  rentalID       Int             @id @default(autoincrement())
+  fechaInicio    DateTime?
+  fechaFin       DateTime?
+  estado         String?
+  alquilerID     Int
+  userID         Int?
+  grupoID        Int?
+  alquiler       alquiler        @relation(fields: [alquilerID], references: [alquilerID])
+  usuario        usuario?        @relation(fields: [userID], references: [userID])
+  grupo          grupo_a_rentar? @relation(fields: [grupoID], references: [grupoID])
+  pagos          pago[]
+}
+
+model pago {
+  pagoID     Int            @id @default(autoincrement())
+  monto      Float
+  metodoPago String?
+  fecha      DateTime?
+  estado     pago_estado     @default(Pendiente)
+  rentalID   Int
+  renta      renta           @relation(fields: [rentalID], references: [rentalID])
+  detalles   pago_usuario[]
+}
+
+model pago_usuario {
+  pagoUsuarioID Int                  @id @default(autoincrement())
+  userID        Int
+  pagoID        Int
+  monto         Float
+  estado        pago_usuario_estado @default(Pendiente)
+  usuario       usuario             @relation(fields: [userID], references: [userID])
+  pago          pago                @relation(fields: [pagoID], references: [pagoID])
+}
+
+model grupo_a_rentar {
+  grupoID        Int                 @id @default(autoincrement())
+  nombre         String
+  descripcion    String?
+  fechaCreacion  DateTime            @default(now())
+  rentas         renta[]
+  miembros       usuario_por_grupo[]
 }
 
 model usuario_por_grupo {
-  grupoID        Int
-  userID         Int
-  grupo_a_rentar grupo_a_rentar @relation(fields: [grupoID], references: [grupoID], onDelete: NoAction, onUpdate: NoAction, map: "usuario_por_grupo_ibfk_1")
-  usuario        usuario        @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "usuario_por_grupo_ibfk_2")
+  grupoID Int
+  userID  Int
+
+  grupo   grupo_a_rentar @relation(fields: [grupoID], references: [grupoID])
+  usuario usuario         @relation(fields: [userID], references: [userID])
 
   @@id([grupoID, userID])
-  @@index([userID], map: "idx_usuario_por_grupo_userID")
+}
+
+enum usuario_tipoUsuario {
+  Inquilino
+  Propietario
 }
 
 enum alquiler_categoria {
@@ -114,24 +106,19 @@ enum alquiler_categoria {
   Oficina
 }
 
-enum pago_usuario_estado {
-  Pendiente
-  Denegado
-  Pagado
+enum alquiler_estadoPublicacion {
+  Disponible
+  Alquilado
 }
 
 enum pago_estado {
   Pendiente
-  Denegado
   Pagado
+  Denegado
 }
 
-enum usuario_tipoUsuario {
-  Inquilino
-  Propietario
-}
-
-enum alquiler_estadoPublicacion {
-  Disponible
-  Alquilado
+enum pago_usuario_estado {
+  Pendiente
+  Pagado
+  Denegado
 }

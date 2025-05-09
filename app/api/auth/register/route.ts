@@ -1,72 +1,80 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient, usuario_tipoUsuario } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
-type RegisterBody = {
-  nombres: string;
-  apellidos: string;
-  telefono: string;
-  email: string;
-  password: string;
-  tipoUsuario: 'Inquilino' | 'Propietario';
-};
-
 export async function POST(req: Request) {
   try {
-    const body: RegisterBody = await req.json();
-    const { nombres, apellidos, telefono, email, password, tipoUsuario } = body;
+    // Leer y tipar los datos del body
+    const body = await req.json();
 
-    // Validaciones
-    if (!nombres || !apellidos || !telefono || !email || !password || !tipoUsuario) {
-      return NextResponse.json({ message: 'Todos los campos son obligatorios' }, { status: 400 });
+    const {
+      email,
+      password,
+      nombres,
+      apellidos,
+      telefono,
+      tipoUsuario,
+    } = body as {
+      email: string;
+      password: string;
+      nombres: string;
+      apellidos: string;
+      telefono: string | number;
+      tipoUsuario: 'Inquilino' | 'Propietario';
+    };
+
+    // Validación básica
+    if (!email || !password || !nombres || !apellidos || !telefono || !tipoUsuario) {
+      return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
     }
 
-    if (!['Inquilino', 'Propietario'].includes(tipoUsuario)) {
-      return NextResponse.json({ message: 'Tipo de usuario inválido' }, { status: 400 });
+    // Verificar si el email ya existe
+    const existingUser = await prisma.credencial.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'El correo ya está registrado' }, { status: 409 });
     }
 
-    const telefonoParsed = parseInt(telefono);
-    if (isNaN(telefonoParsed)) {
-      return NextResponse.json({ message: 'Teléfono inválido' }, { status: 400 });
-    }
-
-    const existing = await prisma.credencial.findFirst({ where: { email } });
-    if (existing) {
-      return NextResponse.json({ message: 'Este correo ya está registrado' }, { status: 400 });
-    }
-
-    // Hashear contraseña
+    // Hashear la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear credencial
-    const credencial = await prisma.credencial.create({
-  data: {
-    email,
-    password: hashedPassword,
-  } as any,
-});
+    const newCredencial = await prisma.credencial.create({
+      data: {
+        email,
+        password: hashedPassword,
+      }as any,
+    });
 
+    // Crear usuario asociado y conectar con la credencial
+    const newUsuario = await prisma.usuario.create({
+      data: {
+        nombres,
+        apellidos,
+        telefono: typeof telefono === 'string' ? parseInt(telefono) : telefono,
+        tipoUsuario,
+        credencial: {
+          connect: {
+            credencialID: newCredencial.credencialID,
+          },
+        },
+      }as any,
+    });
 
-    await prisma.usuario.create({
-  data: {
-    nombres,
-    apellidos,
-    telefono: telefonoParsed,
-    tipoUsuario: tipoUsuario as usuario_tipoUsuario,
-    credencial: {
-      connect: {
-        credencialID: credencial.credencialID,
-      },
-    },
-  } as any,
-});
-
-    return NextResponse.json({ message: 'Registro exitoso' }, { status: 201 });
+    return NextResponse.json(
+      { message: 'Usuario registrado exitosamente', usuario: newUsuario },
+      { status: 201 }
+    );
 
   } catch (error) {
-    console.error('[REGISTRO ERROR]', error);
-    return NextResponse.json({ message: 'Error en el servidor' }, { status: 500 });
+    console.error('[ERROR EN REGISTRO]', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
   }
 }
