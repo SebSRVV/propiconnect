@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../[...nextauth]/route';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { PrismaClient, alquiler_categoria, alquiler_estadoPublicacion } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -27,6 +27,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Precio inválido' }, { status: 400 });
     }
 
+    console.log('Session:', session);
+    console.log('Body:', body);
+    console.log('ownerID:', session?.user?.userID);
+
     // Crear nuevo alquiler
     const nuevoAlquiler = await prisma.alquiler.create({
       data: {
@@ -35,7 +39,7 @@ export async function POST(req: Request) {
         categoria: categoria as alquiler_categoria,
         precio: parsedPrecio,
         estadoPublicacion: alquiler_estadoPublicacion.Disponible,
-        ownerID: session.user.userID,
+        ownerID: Number(session.user.userID),
       },
     });
 
