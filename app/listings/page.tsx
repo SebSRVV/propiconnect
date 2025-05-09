@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
-import { FaMapMarkerAlt, FaTag, FaMoneyBillWave, FaCheckCircle } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaMoneyBillWave, FaCheckCircle } from 'react-icons/fa';
 
 const prisma = new PrismaClient();
 
@@ -17,13 +17,23 @@ export default async function ListingsPage() {
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Propiedades disponibles</h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-white tracking-tight">Propiedades disponibles</h1>
+            <Link
+              href="/"
+              className="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
+            >
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </header>
 
       <section className="max-w-6xl mx-auto px-6 py-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {alquileres.length === 0 ? (
-          <p className="text-center col-span-full text-gray-400">No hay propiedades disponibles en este momento.</p>
+          <p className="text-center col-span-full text-gray-400">
+            No hay propiedades disponibles en este momento.
+          </p>
         ) : (
           alquileres.map((alquiler) => (
             <Link key={alquiler.alquilerID} href={`/listings/${alquiler.alquilerID}`}>

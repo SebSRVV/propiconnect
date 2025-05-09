@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaHome } from 'react-icons/fa'; // <- Agregamos FaHome
 
 function useIsClient() {
   const [isClient, setIsClient] = useState(false);
@@ -42,7 +42,7 @@ export default function LoginPage() {
   if (!isClient) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 flex items-center justify-center px-4">
+    <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-gray-800 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8">
         <h1 className="text-3xl font-bold text-center text-white mb-6">Iniciar sesión</h1>
 
@@ -91,6 +91,15 @@ export default function LoginPage() {
           </a>
         </p>
       </div>
+
+      {/* Botón circular en esquina inferior derecha */}
+      <button
+        onClick={() => router.push('/')}
+        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition duration-300"
+        title="Volver al inicio"
+      >
+        <FaHome className="text-xl" />
+      </button>
     </div>
   );
 }
