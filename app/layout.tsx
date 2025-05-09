@@ -1,19 +1,18 @@
+// app/layout.tsx
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
+import AuthSessionProvider from './SessionProvider'; // Importa tu wrapper client
 
 export const metadata: Metadata = {
-  title: 'PropiConnect',
-  description: 'Plataforma de alquiler y venta de propiedades con opción de pago compartido.',
+  title: 'Proppiconnect',
+  description: 'Encuentra y publica propiedades fácilmente',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className="scroll-smooth">
-      <body className={`${inter.className} bg-gray-900 text-white`}>
-        {children}
+    <html lang="es">
+      <body>
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   );
