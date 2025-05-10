@@ -1,5 +1,3 @@
-// app/checkout/[alquilerID]/page.tsx
-
 import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -8,6 +6,7 @@ import SplitPaymentForm from './SplitPaymentForm';
 
 const prisma = new PrismaClient();
 
+// ✅ NO uses PageProps ni ningún tipo global aquí
 export default async function PropertyDetailPage({
   params,
 }: {
