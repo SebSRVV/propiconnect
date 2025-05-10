@@ -11,6 +11,7 @@ import {
   FaClipboardList,
   FaShoppingCart,
   FaHandshake,
+  FaCalendarAlt,
 } from 'react-icons/fa';
 
 interface Propiedad {
@@ -41,6 +42,9 @@ export default function ListingDetailClient() {
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [error, setError] = useState('');
 
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+
   useEffect(() => {
     const fetchPropiedad = async () => {
       try {
@@ -67,8 +71,19 @@ export default function ListingDetailClient() {
   const prop = propiedad;
 
   const handleCheckout = () => {
-    if (!id) return;
-    router.push(`/checkout/${id}`);
+    if (!id || !fechaInicio) {
+      alert('Por favor selecciona la fecha de inicio.');
+      return;
+    }
+
+    const queryParams = new URLSearchParams({
+      fecha: fechaInicio,
+      modo: prop.modo,
+    });
+
+    if (fechaFin) queryParams.append('hasta', fechaFin);
+
+    router.push(`/checkout/${id}?${queryParams.toString()}`);
   };
 
   return (
@@ -139,13 +154,40 @@ export default function ListingDetailClient() {
           </div>
 
           {prop.estado === 'disponible' && (
-            <button
-              className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md shadow-md flex items-center justify-center gap-2 text-lg font-semibold transition"
-              onClick={handleCheckout}
-            >
-              <FaShoppingCart />
-              {prop.modo === 'alquiler' ? 'Alquilar propiedad' : 'Comprar propiedad'}
-            </button>
+            <div className="mt-6 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm mb-1 text-gray-300">
+                    <FaCalendarAlt className="inline mr-1" /> Fecha de inicio
+                  </label>
+                  <input
+                    type="date"
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1 text-gray-300">
+                    <FaCalendarAlt className="inline mr-1" /> Fecha de fin (opcional)
+                  </label>
+                  <input
+                    type="date"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                  />
+                </div>
+              </div>
+
+              <button
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md shadow-md flex items-center justify-center gap-2 text-lg font-semibold transition"
+                onClick={handleCheckout}
+              >
+                <FaShoppingCart />
+                {prop.modo === 'alquiler' ? 'Alquilar propiedad' : 'Comprar propiedad'}
+              </button>
+            </div>
           )}
         </div>
       </div>
