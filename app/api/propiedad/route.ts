@@ -6,12 +6,10 @@ export async function POST(req: Request) {
   try {
     const { titulo, descripcion, ubicacion, precio, tipo, modo, imagenUrl } = await req.json();
 
-    // Validar campos obligatorios
     if (!titulo || !descripcion || !ubicacion || !precio || !tipo || !modo) {
       return NextResponse.json({ message: 'Faltan datos obligatorios' }, { status: 400 });
     }
 
-    // Leer cookie de sesión de forma segura
     const cookieHeader = req.headers.get('cookie') || '';
     const cookiesParsed = cookie.parse(cookieHeader);
     const session = cookiesParsed.session;
@@ -29,7 +27,6 @@ export async function POST(req: Request) {
 
     const credencialID = user.id;
 
-    // Verificar que el usuario exista y sea Propietario
     const [rows]: any = await db.query(
       'SELECT id, tipoUsuario FROM usuario WHERE credencialID = ?',
       [credencialID]
@@ -60,6 +57,24 @@ export async function POST(req: Request) {
         usuario.id,
       ]
     );
+
+    // Emitir evento por WebSocket
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/emit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'nueva-propiedad',
+        data: {
+          titulo,
+          descripcion,
+          ubicacion,
+          precio,
+          tipo,
+          modo,
+          imagenUrl,
+        },
+      }),
+    });
 
     return NextResponse.json({ message: 'Propiedad publicada exitosamente' }, { status: 201 });
 
