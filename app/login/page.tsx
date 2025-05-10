@@ -1,9 +1,8 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FaEnvelope, FaLock, FaHome } from 'react-icons/fa'; // <- Agregamos FaHome
+import { useRouter } from 'next/navigation';
+import { FaEnvelope, FaLock, FaHome } from 'react-icons/fa';
 
 function useIsClient() {
   const [isClient, setIsClient] = useState(false);
@@ -25,16 +24,22 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (res?.ok) {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Error al iniciar sesión');
+      }
+
       router.push('/dashboard');
-    } else {
-      setError('Correo o contraseña incorrectos.');
+    } catch (err: any) {
+      setError(err.message || 'Error desconocido');
       setLoading(false);
     }
   };
@@ -80,7 +85,7 @@ export default function LoginPage() {
               loading ? 'opacity-60 cursor-not-allowed' : ''
             }`}
           >
-            {loading ? 'Cargando...' : 'Entrar'}
+            {loading ? 'Ingresando...' : 'Entrar'}
           </button>
         </form>
 
@@ -92,7 +97,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Botón circular en esquina inferior derecha */}
       <button
         onClick={() => router.push('/')}
         className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition duration-300"

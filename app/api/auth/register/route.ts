@@ -1,80 +1,56 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import db from '@/lib/db';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+interface RegisterData {
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  email: string;
+  password: string;
+  tipoUsuario: 'Inquilino' | 'Propietario';
+}
 
 export async function POST(req: Request) {
   try {
-    // Leer y tipar los datos del body
-    const body = await req.json();
+    const body: RegisterData = await req.json();
+    const { nombres, apellidos, telefono, email, password, tipoUsuario } = body;
 
-    const {
-      email,
-      password,
-      nombres,
-      apellidos,
-      telefono,
-      tipoUsuario,
-    } = body as {
-      email: string;
-      password: string;
-      nombres: string;
-      apellidos: string;
-      telefono: string | number;
-      tipoUsuario: 'Inquilino' | 'Propietario';
-    };
-
-    // Validación básica
     if (!email || !password || !nombres || !apellidos || !telefono || !tipoUsuario) {
-      return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
+      return NextResponse.json({ message: 'Faltan datos obligatorios' }, { status: 400 });
     }
 
-    // Verificar si el email ya existe
-    const existingUser = await prisma.credencial.findUnique({
-      where: { email },
-    });
+    // 1. Verificar si el email ya existe
+    const [existingRows]: any = await db.query(
+      'SELECT id FROM credencial WHERE email = ?',
+      [email]
+    );
 
-    if (existingUser) {
-      return NextResponse.json({ error: 'El correo ya está registrado' }, { status: 409 });
+    if (existingRows.length > 0) {
+      return NextResponse.json({ message: 'Este correo ya está registrado' }, { status: 409 });
     }
 
-    // Hashear la contraseña
+    // 2. Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Crear credencial
-    const newCredencial = await prisma.credencial.create({
-      data: {
-        email,
-        password: hashedPassword,
-      }as any,
-    });
-
-    // Crear usuario asociado y conectar con la credencial
-    const newUsuario = await prisma.usuario.create({
-      data: {
-        nombres,
-        apellidos,
-        telefono: typeof telefono === 'string' ? parseInt(telefono) : telefono,
-        tipoUsuario,
-        credencial: {
-          connect: {
-            credencialID: newCredencial.credencialID,
-          },
-        },
-      }as any,
-    });
-
-    return NextResponse.json(
-      { message: 'Usuario registrado exitosamente', usuario: newUsuario },
-      { status: 201 }
+    // 3. Insertar credencial
+    const [credResult]: any = await db.query(
+      'INSERT INTO credencial (email, password) VALUES (?, ?)',
+      [email, hashedPassword]
     );
 
+    const credencialID = credResult.insertId;
+
+    // 4. Insertar usuario vinculado a la credencial
+    await db.query(
+      `INSERT INTO usuario (nombres, apellidos, telefono, tipoUsuario, credencialID)
+       VALUES (?, ?, ?, ?, ?)`,
+      [nombres, apellidos, telefono, tipoUsuario, credencialID]
+    );
+
+    return NextResponse.json({ message: 'Registro exitoso' }, { status: 201 });
   } catch (error) {
-    console.error('[ERROR EN REGISTRO]', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    console.error('[REGISTER_ERROR]', error);
+    return NextResponse.json({ message: 'Error en el servidor' }, { status: 500 });
   }
 }

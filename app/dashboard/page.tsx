@@ -1,7 +1,8 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/authOptions';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import db from '@/lib/db';
 import {
+  FaUserCircle,
   FaHome,
   FaMoneyBill,
   FaPlus,
@@ -12,23 +13,36 @@ import {
 import Link from 'next/link';
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
+  const session = cookieStore.get('session');
 
-  if (!session) {
+  if (!session) redirect('/login');
+
+  let userSession;
+  try {
+    userSession = JSON.parse(session.value);
+  } catch {
     redirect('/login');
   }
 
-  const { user } = session;
+  const credencialID = userSession.id;
+
+  const [rows]: any = await db.query(
+    'SELECT nombres, apellidos, tipoUsuario, telefono FROM usuario WHERE credencialID = ?',
+    [credencialID]
+  );
+
+  if (!rows.length) redirect('/login');
+
+  const user = rows[0];
   const isOwner = user.tipoUsuario === 'Propietario';
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
+      {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-white mb-1">Panel de {user.tipoUsuario}</h1>
-            <p className="text-sm text-gray-400">Bienvenido, {user.name}</p>
-          </div>
+        <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Panel de Usuario</h1>
           <Link
             href="/"
             className="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-md transition"
@@ -38,13 +52,35 @@ export default async function DashboardPage() {
         </div>
       </header>
 
+      {/* Perfil */}
+      <section className="max-w-6xl mx-auto mt-10 px-6">
+        <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-md flex items-center gap-6">
+          <div className="bg-blue-900 text-blue-400 p-4 rounded-full">
+            <FaUserCircle size={48} />
+          </div>
+          <div>
+            <h2 className="text-2xl font-semibold text-white mb-1">
+              {user.nombres} {user.apellidos}
+            </h2>
+            <p className="text-gray-300 text-sm">Teléfono: {user.telefono}</p>
+            <p className="text-gray-300 text-sm">Rol: <span className="font-semibold">{user.tipoUsuario}</span></p>
+            <p className="text-gray-300 text-sm">Correo: {userSession.email}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Acciones */}
       <section className="max-w-6xl mx-auto py-16 px-6">
+        <h3 className="text-xl font-bold text-gray-200 mb-8">
+          {isOwner ? 'Acciones del Propietario' : 'Opciones para Inquilinos'}
+        </h3>
+
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {isOwner ? (
             <>
               <DashboardCard
                 icon={<FaPlus size={24} />}
-                title="Publicar nueva propiedad"
+                title="Publicar propiedad"
                 link="/create-listing"
                 description="Comparte tu propiedad con posibles inquilinos."
               />
@@ -52,19 +88,19 @@ export default async function DashboardPage() {
                 icon={<FaClipboardList size={24} />}
                 title="Mis propiedades"
                 link="/my-listings"
-                description="Revisa, edita o elimina tus propiedades publicadas."
+                description="Revisa y gestiona tus propiedades."
               />
               <DashboardCard
                 icon={<FaEdit size={24} />}
                 title="Editar propiedad"
                 link="/edit-listings"
-                description="Accede a la edición de tus propiedades."
+                description="Actualiza información de tus publicaciones."
               />
               <DashboardCard
                 icon={<FaTrash size={24} />}
                 title="Eliminar propiedad"
                 link="/delete-listings"
-                description="Elimina propiedades que ya no deseas publicar."
+                description="Quita publicaciones que ya no deseas mostrar."
               />
             </>
           ) : (
@@ -79,13 +115,14 @@ export default async function DashboardPage() {
                 icon={<FaMoneyBill size={24} />}
                 title="Mis pagos"
                 link="/my-payments"
-                description="Revisa el historial y estado de tus pagos."
+                description="Consulta tu historial y estado de pagos."
               />
             </>
           )}
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="text-center text-sm text-white-500 py-6 bg-gray-800 border-t border-gray-700">
         © 2025 Proppiconnect. Todos los derechos reservados.
       </footer>

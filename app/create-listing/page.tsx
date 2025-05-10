@@ -1,127 +1,155 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { redirect, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { alquiler_categoria } from '@prisma/client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { FaHome, FaFileAlt, FaMapMarkerAlt, FaDollarSign, FaImage } from 'react-icons/fa';
 
 export default function CreateListingPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
-
   const [form, setForm] = useState({
-    direccion: '',
-    categoria: 'Casa' as alquiler_categoria,
+    titulo: '',
     descripcion: '',
+    ubicacion: '',
     precio: '',
+    tipo: 'casa',
+    modo: 'alquiler',
+    imagenUrl: '',
   });
-
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) redirect('/login');
-    if (session?.user.tipoUsuario !== 'Propietario') redirect('/');
-  }, [session, status]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    if (!form.direccion || !form.precio) {
-      setError('Dirección y precio son obligatorios.');
-      return;
-    }
+    try {
+      const res = await fetch('/api/propiedad', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const res = await fetch('/api/alquileres', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        precio: parseFloat(form.precio),
-        ownerID: session?.user.userID,
-      }),
-    });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al crear propiedad');
 
-    if (!res.ok) {
-      setError('Error al crear la propiedad.');
-    } else {
       router.push('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Error inesperado');
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white px-4 py-10">
-      <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Publicar nueva propiedad</h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center px-4">
+      <form onSubmit={handleSubmit} className="bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8 w-full max-w-lg space-y-5">
+        <h1 className="text-3xl font-bold text-center text-white mb-2">Publicar Propiedad</h1>
+        {error && <div className="bg-red-200 text-red-800 p-2 rounded text-sm">{error}</div>}
 
-        {error && <p className="text-red-400 mb-4">{error}</p>}
+        <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+          <FaHome className="text-gray-300 mr-2" />
+          <input
+            name="titulo"
+            value={form.titulo}
+            onChange={handleChange}
+            required
+            placeholder="Título"
+            className="w-full bg-transparent text-white focus:outline-none"
+          />
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block">
-            Dirección:
-            <input
-              name="direccion"
-              type="text"
-              value={form.direccion}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 rounded bg-gray-800 text-white"
-              required
-            />
-          </label>
+        <div className="bg-gray-700 rounded px-3 py-2">
+          <label htmlFor="descripcion" className="text-sm text-gray-300 block mb-1">Descripción</label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            value={form.descripcion}
+            onChange={handleChange}
+            required
+            rows={3}
+            className="w-full bg-transparent text-white resize-none focus:outline-none"
+          />
+        </div>
 
-          <label className="block">
-            Categoría:
+        <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+          <FaMapMarkerAlt className="text-gray-300 mr-2" />
+          <input
+            name="ubicacion"
+            value={form.ubicacion}
+            onChange={handleChange}
+            required
+            placeholder="Ubicación"
+            className="w-full bg-transparent text-white focus:outline-none"
+          />
+        </div>
+
+        <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+          <FaDollarSign className="text-gray-300 mr-2" />
+          <input
+            type="number"
+            name="precio"
+            value={form.precio}
+            onChange={handleChange}
+            required
+            placeholder="Precio"
+            className="w-full bg-transparent text-white focus:outline-none"
+          />
+        </div>
+
+        <div className="flex gap-4">
+          <div className="w-1/2">
+            <label className="text-sm text-gray-300 block mb-1">Tipo</label>
             <select
-              name="categoria"
-              value={form.categoria}
+              name="tipo"
+              value={form.tipo}
               onChange={handleChange}
-              className="w-full mt-1 p-2 rounded bg-gray-800 text-white"
+              className="w-full bg-gray-700 text-white p-2 rounded focus:outline-none"
             >
-              <option value="Casa">Casa</option>
-              <option value="Departamento">Departamento</option>
-              <option value="Cuarto">Cuarto</option>
-              <option value="Oficina">Oficina</option>
+              <option value="casa">Casa</option>
+              <option value="departamento">Departamento</option>
+              <option value="habitacion">Habitación</option>
             </select>
-          </label>
+          </div>
 
-          <label className="block">
-            Descripción:
-            <textarea
-              name="descripcion"
-              value={form.descripcion}
+          <div className="w-1/2">
+            <label className="text-sm text-gray-300 block mb-1">Modo</label>
+            <select
+              name="modo"
+              value={form.modo}
               onChange={handleChange}
-              className="w-full mt-1 p-2 rounded bg-gray-800 text-white"
-              rows={4}
-            />
-          </label>
+              className="w-full bg-gray-700 text-white p-2 rounded focus:outline-none"
+            >
+              <option value="alquiler">Alquiler</option>
+              <option value="venta">Venta</option>
+            </select>
+          </div>
+        </div>
 
-          <label className="block">
-            Precio:
-            <input
-              name="precio"
-              type="number"
-              min="0"
-              step="0.01"
-              value={form.precio}
-              onChange={handleChange}
-              className="w-full mt-1 p-2 rounded bg-gray-800 text-white"
-              required
-            />
-          </label>
+        <div className="flex items-center bg-gray-700 rounded px-3 py-2">
+          <FaImage className="text-gray-300 mr-2" />
+          <input
+            name="imagenUrl"
+            value={form.imagenUrl}
+            onChange={handleChange}
+            placeholder="URL de imagen (opcional)"
+            className="w-full bg-transparent text-white focus:outline-none"
+          />
+        </div>
 
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white transition"
-          >
-            Publicar propiedad
-          </button>
-        </form>
-      </div>
-    </main>
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full bg-blue-600 hover:bg-blue-700 py-2 rounded text-white transition ${
+            loading ? 'opacity-60 cursor-not-allowed' : ''
+          }`}
+        >
+          {loading ? 'Publicando...' : 'Publicar propiedad'}
+        </button>
+      </form>
+    </div>
   );
 }
