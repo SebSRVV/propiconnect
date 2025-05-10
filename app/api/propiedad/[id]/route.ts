@@ -44,29 +44,3 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ message: 'Error eliminando propiedad' }, { status: 500 });
   }
 }
-
-export async function PUT(req: NextRequest) {
-    try {
-      const url = new URL(req.url);
-      const segments = url.pathname.split('/');
-      const idStr = segments[segments.length - 1];
-      const id = parseInt(idStr, 10);
-  
-      if (isNaN(id)) {
-        return NextResponse.json({ message: 'ID inválido' }, { status: 400 });
-      }
-  
-      const data = await req.json();
-  
-      await db.query(
-        `UPDATE propiedad 
-         SET titulo = ?, ubicacion = ?, descripcion = ?, precio = ?, tipo = ?, estado = ?, imagenUrl = ? 
-         WHERE id = ?`,
-        [data.titulo, data.ubicacion, data.descripcion, data.precio, data.tipo, data.estado, data.imagenUrl, id]
-      );
-  
-      return NextResponse.json({ message: 'Propiedad actualizada' });
-    } catch (err) {
-      return NextResponse.json({ message: 'Error al actualizar propiedad' }, { status: 500 });
-    }
-  }

@@ -91,12 +91,6 @@ export default async function DashboardPage() {
                 description="Revisa y gestiona tus propiedades."
               />
               <DashboardCard
-                icon={<FaEdit size={24} />}
-                title="Editar propiedad"
-                link="/edit-listings"
-                description="Actualiza información de tus publicaciones."
-              />
-              <DashboardCard
                 icon={<FaTrash size={24} />}
                 title="Eliminar propiedad"
                 link="/delete-listings"
