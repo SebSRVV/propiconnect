@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { FaSearch, FaHome, FaUserPlus, FaMoneyCheckAlt } from "react-icons/fa";
 
