@@ -1,7 +1,14 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  FaCalendarAlt,
+  FaDollarSign,
+  FaUserPlus,
+  FaCheckCircle,
+  FaTrash,
+} from 'react-icons/fa';
 
 interface Propiedad {
   id: number;
@@ -28,10 +35,10 @@ function getImagenPorTipo(tipo: string): string {
 }
 
 export default function CheckoutPage() {
+  const { id } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const propiedadID = searchParams.get('propiedadID');
   const fecha = searchParams.get('fecha');
   const modo = searchParams.get('modo');
 
@@ -50,7 +57,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     const fetchPropiedad = async () => {
       try {
-        const res = await fetch(`/api/propiedad/${propiedadID}`);
+        const res = await fetch(`/api/propiedad/${id}`);
         if (!res.ok) throw new Error('No se pudo cargar la propiedad');
         const data = await res.json();
         setPropiedad(data);
@@ -61,8 +68,8 @@ export default function CheckoutPage() {
       }
     };
 
-    if (propiedadID) fetchPropiedad();
-  }, [propiedadID]);
+    if (id) fetchPropiedad();
+  }, [id]);
 
   const handleAgregar = () => {
     const monto = parseFloat(nuevoMonto);
@@ -80,7 +87,7 @@ export default function CheckoutPage() {
   };
 
   const handleConfirmar = async () => {
-    if (!propiedadID || !fecha || restante > 0) return;
+    if (!id || !fecha || restante > 0) return;
 
     setConfirming(true);
     try {
@@ -88,7 +95,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          propiedadID: Number(propiedadID),
+          propiedadID: Number(id),
           fechaInicio: fecha,
           adicionales: participantes,
         }),
@@ -105,11 +112,21 @@ export default function CheckoutPage() {
     }
   };
 
-  if (loading)
-    return <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">Cargando propiedad...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
+        Cargando propiedad...
+      </div>
+    );
+  }
 
-  if (error || !propiedad)
-    return <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">Error: {error}</div>;
+  if (error || !propiedad) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
+        Error: {error}
+      </div>
+    );
+  }
 
   const imagen = propiedad.imagenUrl || getImagenPorTipo(propiedad.tipo);
 
@@ -117,7 +134,9 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-6xl mx-auto px-6 py-6">
-          <h1 className="text-2xl font-bold">Confirmar {modo === 'venta' ? 'compra' : 'alquiler'}</h1>
+          <h1 className="text-2xl font-bold">
+            Confirmar {modo === 'venta' ? 'compra' : 'alquiler'}
+          </h1>
         </div>
       </header>
 
@@ -140,21 +159,27 @@ export default function CheckoutPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Precio total</p>
-                <p className="text-blue-400 font-semibold">${propiedad.precio.toLocaleString()}</p>
+                <p className="text-blue-400 font-semibold">
+                  <FaDollarSign className="inline mb-1" /> {propiedad.precio.toLocaleString()}
+                </p>
               </div>
               {fecha && (
                 <div>
                   <p className="text-sm text-gray-500">Fecha de inicio</p>
-                  <p>{fecha}</p>
+                  <p className="flex items-center gap-2">
+                    <FaCalendarAlt /> {fecha}
+                  </p>
                 </div>
               )}
             </div>
 
-            {/* Participantes adicionales */}
+            {/* División de pagos */}
             <div className="bg-gray-700 p-4 rounded-md space-y-4">
-              <h3 className="font-semibold text-lg">División de pagos</h3>
+              <h3 className="font-semibold text-lg flex items-center gap-2">
+                <FaUserPlus /> División de pagos
+              </h3>
 
-              <div className="flex gap-4">
+              <div className="flex gap-4 flex-wrap sm:flex-nowrap">
                 <input
                   type="email"
                   placeholder="Correo del usuario"
@@ -169,7 +194,10 @@ export default function CheckoutPage() {
                   onChange={(e) => setNuevoMonto(e.target.value)}
                   className="w-32 bg-gray-800 px-3 py-2 rounded text-white"
                 />
-                <button onClick={handleAgregar} className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white">
+                <button
+                  onClick={handleAgregar}
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
+                >
                   Agregar
                 </button>
               </div>
@@ -177,7 +205,10 @@ export default function CheckoutPage() {
               {participantes.length > 0 && (
                 <ul className="text-sm mt-4 space-y-2">
                   {participantes.map((p, i) => (
-                    <li key={i} className="flex justify-between items-center bg-gray-800 px-3 py-2 rounded">
+                    <li
+                      key={i}
+                      className="flex justify-between items-center bg-gray-800 px-3 py-2 rounded"
+                    >
                       <span>
                         {p.email} — ${p.monto.toFixed(2)}
                       </span>
@@ -185,22 +216,39 @@ export default function CheckoutPage() {
                         onClick={() => handleEliminar(i)}
                         className="text-red-400 hover:text-red-600 text-xs"
                       >
-                        Eliminar
+                        <FaTrash className="inline" /> Eliminar
                       </button>
                     </li>
                   ))}
                 </ul>
               )}
 
-              <div className="text-sm mt-4 text-gray-300">
-                <p>Total aportado: <span className="text-white font-semibold">${totalAportado.toFixed(2)}</span></p>
-                <p>Restante: <span className={restante > 0 ? 'text-red-400' : 'text-green-400'}>${restante.toFixed(2)}</span></p>
+              <div className="text-sm mt-4 text-gray-300 space-y-1">
+                <p>
+                  Total aportado:{' '}
+                  <span className="text-white font-semibold">
+                    ${totalAportado.toFixed(2)}
+                  </span>
+                </p>
+                <p>
+                  Restante:{' '}
+                  <span
+                    className={
+                      restante > 0 ? 'text-red-400' : 'text-green-400'
+                    }
+                  >
+                    ${restante.toFixed(2)}
+                  </span>
+                </p>
               </div>
             </div>
 
+            {/* Confirmación */}
             {resultado ? (
-              <div className="bg-green-800 p-4 rounded-md border border-green-500 text-sm mt-4">
-                <p>{resultado.message}</p>
+              <div className="bg-green-800 p-4 rounded-md border border-green-500 text-sm mt-4 space-y-2">
+                <p className="flex items-center gap-2">
+                  <FaCheckCircle /> {resultado.message}
+                </p>
                 <p>Grupo ID: {resultado.grupoID}</p>
                 <p>Reserva ID: {resultado.reservaID}</p>
                 <button
@@ -216,7 +264,9 @@ export default function CheckoutPage() {
                 disabled={restante > 0 || confirming}
                 className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed mt-4"
               >
-                {confirming ? 'Procesando...' : 'Confirmar alquiler'}
+                {confirming
+                  ? 'Procesando...'
+                  : `Confirmar ${modo === 'venta' ? 'compra' : 'alquiler'}`}
               </button>
             )}
           </div>

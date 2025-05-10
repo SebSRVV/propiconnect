@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
@@ -37,6 +37,7 @@ function getImagenPorTipo(tipo: string) {
 
 export default function ListingDetailClient() {
   const { id } = useParams();
+  const router = useRouter();
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [error, setError] = useState('');
 
@@ -64,6 +65,11 @@ export default function ListingDetailClient() {
   }
 
   const prop = propiedad;
+
+  const handleCheckout = () => {
+    if (!id) return;
+    router.push(`/checkout/${id}`);
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-12">
@@ -135,7 +141,7 @@ export default function ListingDetailClient() {
           {prop.estado === 'disponible' && (
             <button
               className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md shadow-md flex items-center justify-center gap-2 text-lg font-semibold transition"
-              onClick={() => alert(`Has iniciado el proceso para ${prop.modo === 'alquiler' ? 'alquilar' : 'comprar'} esta propiedad.`)}
+              onClick={handleCheckout}
             >
               <FaShoppingCart />
               {prop.modo === 'alquiler' ? 'Alquilar propiedad' : 'Comprar propiedad'}
