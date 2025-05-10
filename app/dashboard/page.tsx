@@ -13,7 +13,7 @@ import {
 import Link from 'next/link';
 
 export default async function DashboardPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('session');
 
   if (!session) redirect('/login');

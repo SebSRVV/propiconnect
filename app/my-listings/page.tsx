@@ -24,7 +24,7 @@ function getImagenPorTipo(tipo: string): string {
 }
 
 export default async function MyListingsPage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('session');
 
   if (!session) redirect('/login');
