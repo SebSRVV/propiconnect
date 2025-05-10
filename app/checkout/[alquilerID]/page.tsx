@@ -1,3 +1,5 @@
+// app/checkout/[alquilerID]/page.tsx
+
 import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -6,13 +8,11 @@ import SplitPaymentForm from './SplitPaymentForm';
 
 const prisma = new PrismaClient();
 
-type Props = {
-  params: {
-    alquilerID: string;
-  };
-};
-
-export default async function PropertyDetailPage({ params }: Props) {
+export default async function PropertyDetailPage({
+  params,
+}: {
+  params: { alquilerID: string };
+}) {
   const alquiler = await prisma.alquiler.findUnique({
     where: { alquilerID: Number(params.alquilerID) },
     include: { usuario: true },
