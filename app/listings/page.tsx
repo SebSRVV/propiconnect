@@ -1,8 +1,5 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import db from '@/lib/db';
 import Link from 'next/link';
-import socket from '@/lib/socket';
 
 interface Propiedad {
   id: number;
@@ -22,30 +19,13 @@ function getImagenPorTipo(tipo: string) {
     departamento: '/departamento.jpg',
     habitacion: '/habitacion.jpg',
   };
+
   return tipos[tipo.toLowerCase()] || '/casa.jpg';
 }
 
-export default function ListingsPage() {
-  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
-
-  useEffect(() => {
-    // Cargar propiedades desde la API
-    fetch('/api/listings')
-      .then((res) => res.json())
-      .then((data) => setPropiedades(data));
-
-    const handler = (nueva: Propiedad) => {
-      setPropiedades((prev) => [nueva, ...prev]);
-    };
-
-    // Escuchar evento WebSocket
-    socket.on('nueva-propiedad', handler);
-
-    // Limpiar el listener al desmontar
-    return () => {
-      socket.off('nueva-propiedad', handler);
-    };
-  }, []);
+export default async function ListingsPage() {
+  const [rows]: any = await db.query('SELECT * FROM propiedad');
+  const propiedades: Propiedad[] = rows;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -77,6 +57,7 @@ export default function ListingsPage() {
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
 
+                  {/* Estado badge */}
                   <span
                     className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded uppercase tracking-wide
                       ${
@@ -87,7 +68,8 @@ export default function ListingsPage() {
                           : prop.estado === 'vendida'
                           ? 'bg-red-600 text-red-100'
                           : 'bg-gray-600 text-gray-100'
-                      }`}
+                      }
+                    `}
                   >
                     {prop.estado}
                   </span>
@@ -96,6 +78,7 @@ export default function ListingsPage() {
                   <p className="text-sm text-gray-400 mb-1">{prop.ubicacion}</p>
                   <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
 
+                  {/* Precio mejorado */}
                   <p className="text-xl font-semibold text-blue-400 mt-2">
                     ${prop.precio.toLocaleString()}
                     {prop.modo === 'alquiler' ? (
