@@ -45,9 +45,17 @@ export async function DELETE(req: NextRequest) {
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest) {
     try {
-      const id = parseInt(params.id, 10);
+      const url = new URL(req.url);
+      const segments = url.pathname.split('/');
+      const idStr = segments[segments.length - 1];
+      const id = parseInt(idStr, 10);
+  
+      if (isNaN(id)) {
+        return NextResponse.json({ message: 'ID inválido' }, { status: 400 });
+      }
+  
       const data = await req.json();
   
       await db.query(
@@ -62,4 +70,3 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Error al actualizar propiedad' }, { status: 500 });
     }
   }
-  
