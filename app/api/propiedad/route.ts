@@ -1,7 +1,3 @@
-export const dynamic = 'force-dynamic';
-export const revalidate = 30;
-
-
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import cookie from 'cookie';
@@ -64,8 +60,6 @@ export async function POST(req: Request) {
         usuario.id,
       ]
     );
-
-    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/revalidate?secret=${process.env.REVALIDATE_SECRET_TOKEN}`);
 
     return NextResponse.json({ message: 'Propiedad publicada exitosamente' }, { status: 201 });
 
