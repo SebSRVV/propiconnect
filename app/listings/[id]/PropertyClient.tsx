@@ -29,7 +29,7 @@ export default function PropertyClient({ propiedad }: { propiedad: Propiedad }) 
     const params = new URLSearchParams({
       propiedadID: propiedad.id.toString(),
       modo: propiedad.modo,
-      ...(propiedad.modo === 'alquiler' && { fecha }),
+      ...(propiedad.modo === 'alquiler' ? { fecha } : {}),
     });
 
     router.push(`/checkout?${params.toString()}`);
@@ -106,9 +106,18 @@ export default function PropertyClient({ propiedad }: { propiedad: Propiedad }) 
 
             <button
               onClick={handleReservar}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md transition"
+              disabled={propiedad.estado !== 'disponible'}
+              className={`mt-4 py-2 px-6 rounded-md transition text-white ${
+                propiedad.estado === 'disponible'
+                  ? 'bg-blue-600 hover:bg-blue-700'
+                  : 'bg-gray-600 cursor-not-allowed'
+              }`}
             >
-              {propiedad.modo === 'alquiler' ? 'Alquilar esta propiedad' : 'Comprar esta propiedad'}
+              {propiedad.estado !== 'disponible'
+                ? 'No disponible'
+                : propiedad.modo === 'alquiler'
+                ? 'Alquilar esta propiedad'
+                : 'Comprar esta propiedad'}
             </button>
           </div>
         </div>

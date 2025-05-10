@@ -1,9 +1,6 @@
-'use client';
-
-import db from '@/lib/db';
 import { notFound } from 'next/navigation';
+import db from '@/lib/db';
 import PropertyClient from './PropertyClient';
-import { useEffect, useState } from 'react';
 
 interface Propiedad {
   id: number;
@@ -26,28 +23,13 @@ function getImagenPorTipo(tipo: string): string {
   return imagenes[tipo.toLowerCase()] || '/casa.jpg';
 }
 
-export default function PageContent({ propiedadID }: { propiedadID: string }) {
-  const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
-  const [error, setError] = useState(false);
+export default async function PropertyPageContent({ propiedadID }: { propiedadID: string }) {
+  const [rows]: any = await db.query('SELECT * FROM propiedad WHERE id = ?', [propiedadID]);
 
-  useEffect(() => {
-    const fetchPropiedad = async () => {
-      try {
-        const res = await fetch(`/api/propiedad/${propiedadID}`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        data.imagenUrl = data.imagenUrl || getImagenPorTipo(data.tipo);
-        setPropiedad(data);
-      } catch {
-        setError(true);
-      }
-    };
+  if (!rows.length) return notFound();
 
-    fetchPropiedad();
-  }, [propiedadID]);
-
-  if (error) return notFound();
-  if (!propiedad) return <div className="text-white p-6">Cargando...</div>;
+  const propiedad: Propiedad = rows[0];
+  propiedad.imagenUrl = propiedad.imagenUrl || getImagenPorTipo(propiedad.tipo);
 
   return <PropertyClient propiedad={propiedad} />;
 }

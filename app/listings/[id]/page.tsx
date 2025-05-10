@@ -1,6 +1,5 @@
-import { notFound } from 'next/navigation';
-import PageContent from './PageContent';
+import PropertyPageContent from './PageContent';
 
 export default function Page({ params }: { params: { id: string } }) {
-  return <PageContent propiedadID={params.id} />;
+  return <PropertyPageContent propiedadID={params.id} />;
 }

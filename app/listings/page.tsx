@@ -7,7 +7,8 @@ interface Propiedad {
   ubicacion: string;
   descripcion: string;
   precio: number;
-  tipo: string;         // ← debe existir en tu tabla
+  tipo: string;
+  estado: string;
   imagenUrl?: string;
 }
 
@@ -18,7 +19,7 @@ function getImagenPorTipo(tipo: string) {
     habitacion: '/habitacion.jpg',
   };
 
-  return tipos[tipo.toLowerCase()] || '/casa.jpg'; // valor por defecto
+  return tipos[tipo.toLowerCase()] || '/casa.jpg';
 }
 
 export default async function ListingsPage() {
@@ -46,15 +47,31 @@ export default async function ListingsPage() {
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {propiedades.map((prop) => (
               <Link key={prop.id} href={`/listings/${prop.id}`}>
-                <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg shadow hover:border-blue-500 hover:shadow-lg transition cursor-pointer">
+                <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg shadow hover:border-blue-500 hover:shadow-lg transition cursor-pointer relative">
                   <img
                     src={prop.imagenUrl || getImagenPorTipo(prop.tipo)}
                     alt={prop.titulo}
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
+                  
+                  {/* Badge del estado */}
+                  <span
+                    className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded
+                      ${
+                        prop.estado === 'disponible'
+                          ? 'bg-green-700 text-green-300'
+                          : prop.estado === 'alquilada'
+                          ? 'bg-yellow-700 text-yellow-300'
+                          : 'bg-gray-700 text-gray-300'
+                      }
+                    `}
+                  >
+                    {prop.estado}
+                  </span>
+
                   <h3 className="text-lg font-bold text-white mb-1">{prop.titulo}</h3>
                   <p className="text-sm text-gray-400 mb-1">{prop.ubicacion}</p>
-                  <p className="text-sm text-gray-400 capitalize mb-2">{prop.tipo}</p>
+                  <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
                   <p className="text-blue-400 font-semibold text-md">${prop.precio.toLocaleString()}</p>
                 </div>
               </Link>
