@@ -26,13 +26,19 @@ interface Propiedad {
   imagenUrl?: string;
 }
 
+interface Resena {
+  id: number;
+  nombre: string;
+  comentario: string;
+  fechaCreacion: string;
+}
+
 function getImagenPorTipo(tipo: string) {
   const tipos: Record<string, string> = {
     casa: '/casa.jpg',
     departamento: '/departamento.jpg',
     habitacion: '/habitacion.jpg',
   };
-
   return tipos[tipo.toLowerCase()] || '/casa.jpg';
 }
 
@@ -45,20 +51,85 @@ export default function ListingDetailClient() {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
 
-  useEffect(() => {
-    const fetchPropiedad = async () => {
-      try {
-        const res = await fetch(`/api/propiedad/${id}`);
-        if (!res.ok) throw new Error('No se encontró la propiedad');
-        const data = await res.json();
-        setPropiedad(data);
-      } catch (err: any) {
-        setError(err.message);
-      }
-    };
+  const [reseña, setReseña] = useState('');
+  const [resenas, setResenas] = useState<Resena[]>([]);
 
-    if (id) fetchPropiedad();
+  useEffect(() => {
+    if (id) {
+      fetchPropiedad();
+      fetchResenas();
+    }
   }, [id]);
+
+  const fetchPropiedad = async () => {
+    try {
+      const res = await fetch(`/api/propiedad/${id}`);
+      if (!res.ok) throw new Error('No se encontró la propiedad');
+      const data = await res.json();
+      setPropiedad(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  const fetchResenas = async () => {
+    try {
+      const res = await fetch(`/api/resena?propiedadID=${id}`);
+      const data = await res.json();
+      if (res.ok) {
+        setResenas(data.resenas || []);
+      }
+    } catch (err) {
+      console.error('Error al cargar reseñas');
+    }
+  };
+
+  const handleCheckout = () => {
+    if (!id || !fechaInicio) {
+      alert('Por favor selecciona la fecha de inicio.');
+      return;
+    }
+
+    const queryParams = new URLSearchParams({
+      fecha: fechaInicio,
+      modo: propiedad!.modo,
+    });
+
+    if (fechaFin) queryParams.append('hasta', fechaFin);
+
+    router.push(`/checkout/${id}?${queryParams.toString()}`);
+  };
+
+  const handleEnviarReseña = async () => {
+    if (!reseña.trim()) {
+      alert('La reseña no puede estar vacía.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/resena', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          propiedadID: Number(id),
+          comentario: reseña,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || 'Error al enviar la reseña.');
+        return;
+      }
+
+      alert('Gracias por tu reseña.');
+      setReseña('');
+      fetchResenas(); // Actualizar lista
+    } catch (err) {
+      alert('Hubo un error al enviar la reseña.');
+    }
+  };
 
   if (error) {
     return <p className="text-red-400 text-center mt-10">{error}</p>;
@@ -69,22 +140,6 @@ export default function ListingDetailClient() {
   }
 
   const prop = propiedad;
-
-  const handleCheckout = () => {
-    if (!id || !fechaInicio) {
-      alert('Por favor selecciona la fecha de inicio.');
-      return;
-    }
-
-    const queryParams = new URLSearchParams({
-      fecha: fechaInicio,
-      modo: prop.modo,
-    });
-
-    if (fechaFin) queryParams.append('hasta', fechaFin);
-
-    router.push(`/checkout/${id}?${queryParams.toString()}`);
-  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white px-6 py-12">
@@ -189,6 +244,46 @@ export default function ListingDetailClient() {
               </button>
             </div>
           )}
+
+          {/* Sección de Reseñas */}
+          <section className="mt-12 bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h2 className="text-2xl font-bold mb-4 text-white">Reseñas</h2>
+
+            {resenas.length === 0 ? (
+              <p className="text-gray-400 text-sm">Aún no hay reseñas para esta propiedad.</p>
+            ) : (
+              <div className="space-y-4 mb-6">
+                {resenas.map((review) => (
+                  <div key={review.id} className="bg-gray-700 p-4 rounded-md">
+                    <p className="text-sm text-gray-300 italic">"{review.comentario}"</p>
+                    <p className="text-xs text-right text-gray-400 mt-2">
+                      – {review.nombre}, {new Date(review.fechaCreacion).toLocaleDateString('es-ES')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <label htmlFor="review" className="block text-sm text-gray-300 font-medium">
+                Escribe tu reseña:
+              </label>
+              <textarea
+                id="review"
+                rows={4}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                placeholder="Comparte tu experiencia..."
+                value={reseña}
+                onChange={(e) => setReseña(e.target.value)}
+              />
+              <button
+                onClick={handleEnviarReseña}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+              >
+                Enviar reseña
+              </button>
+            </div>
+          </section>
         </div>
       </div>
     </main>
