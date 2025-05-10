@@ -1,5 +1,5 @@
 import PropertyPageContent from './PageContent';
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { id: string } }) {
   return <PropertyPageContent propiedadID={params.id} />;
 }
