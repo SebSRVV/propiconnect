@@ -75,12 +75,23 @@ export default function CheckoutPage() {
   }, [id]);
 
   const handleAgregar = () => {
+    const email = nuevoEmail.trim().toLowerCase();
     const monto = parseFloat(nuevoMonto);
-    if (!nuevoEmail || isNaN(monto) || monto <= 0) return;
 
-    setParticipantes([...participantes, { email: nuevoEmail, monto }]);
+    if (!email || isNaN(monto) || monto <= 0) {
+      setMensaje('Ingresa un correo válido y un monto mayor a 0.');
+      return;
+    }
+
+    if (participantes.some((p) => p.email === email)) {
+      setMensaje('Este correo ya fue agregado.');
+      return;
+    }
+
+    setParticipantes([...participantes, { email, monto }]);
     setNuevoEmail('');
     setNuevoMonto('');
+    setMensaje('');
   };
 
   const handleEliminar = (index: number) => {
@@ -118,7 +129,6 @@ export default function CheckoutPage() {
 
       setResultado(data);
       setMensaje('');
-      // Actualizar estado de propiedad localmente si quieres
       setPropiedad((prev) =>
         prev ? { ...prev, estado: modo === 'venta' ? 'vendida' : 'alquilada' } : prev
       );
