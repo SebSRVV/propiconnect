@@ -6,7 +6,13 @@ import SplitPaymentForm from './SplitPaymentForm';
 
 const prisma = new PrismaClient();
 
-export default async function PropertyDetailPage({ params }: { params: { alquilerID: string } }) {
+type Props = {
+  params: {
+    alquilerID: string;
+  };
+};
+
+export default async function PropertyDetailPage({ params }: Props) {
   const alquiler = await prisma.alquiler.findUnique({
     where: { alquilerID: Number(params.alquilerID) },
     include: { usuario: true },
