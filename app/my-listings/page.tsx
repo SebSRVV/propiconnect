@@ -32,10 +32,10 @@ export default async function ListingsPage() {
         <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold">Explorar Propiedades</h1>
           <Link
-            href="/"
+            href="/dashboard"
             className="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-md transition"
           >
-            Volver al inicio
+            Volver al dashboard
           </Link>
         </div>
       </header>

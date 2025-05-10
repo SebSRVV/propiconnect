@@ -135,7 +135,7 @@ export default function CheckoutPage() {
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-6xl mx-auto px-6 py-6">
           <h1 className="text-2xl font-bold">
-            Confirmar {modo === 'venta' ? 'compra' : 'alquiler'}
+            Checkout de Item {propiedad.id}
           </h1>
         </div>
       </header>
