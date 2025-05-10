@@ -1,5 +1,5 @@
 // lib/authOptions.ts
-import { AuthOptions, SessionStrategy } from 'next-auth';
+import type { AuthOptions, SessionStrategy, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
@@ -36,27 +36,36 @@ export const authOptions: AuthOptions = {
         const passwordMatch = await bcrypt.compare(password, credencial.password);
         if (!passwordMatch) return null;
 
+        // ✅ Retorna solo propiedades compatibles con el tipo User
         return {
           id: String(usuario.userID),
           name: `${usuario.nombres} ${usuario.apellidos}`,
           email: credencial.email,
-          tipoUsuario: usuario.tipoUsuario,
         };
       },
     }),
   ],
   session: {
-    strategy: 'jwt' as SessionStrategy, // 👈 esto soluciona el error de tipo
+    strategy: 'jwt' as SessionStrategy, // asegura tipado correcto
   },
   callbacks: {
     async jwt({ token, user }) {
+      // Al iniciar sesión por primera vez
       if (user) {
         token.userID = user.id;
-        token.tipoUsuario = user.tipoUsuario;
+
+        // Recuperamos tipoUsuario desde Prisma
+        const credencial = await prisma.credencial.findUnique({
+          where: { email: user.email! },
+          include: { usuario: true },
+        });
+
+        token.tipoUsuario = credencial?.usuario?.tipoUsuario;
       }
       return token;
     },
     async session({ session, token }) {
+      // Incluimos los campos adicionales en la sesión
       if (token && session.user) {
         session.user.userID = token.userID;
         session.user.tipoUsuario = token.tipoUsuario;
