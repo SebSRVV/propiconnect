@@ -1,5 +1,5 @@
-import db from '@/lib/db';
 import { notFound } from 'next/navigation';
+import db from '@/lib/db';
 import EditForm from './EditForm';
 
 interface Propiedad {
@@ -13,7 +13,13 @@ interface Propiedad {
   imagenUrl?: string;
 }
 
-export default async function EditListingPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function EditListingPage({ params }: PageProps) {
   const id = parseInt(params.id, 10);
 
   if (isNaN(id)) return notFound();
