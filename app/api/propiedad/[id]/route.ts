@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 
 export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  context: { params: any }
 ) {
   try {
-    const propiedadID = params.id;
+    const propiedadID = context.params.id;
 
     if (!propiedadID) {
       return NextResponse.json({ message: 'ID no proporcionado' }, { status: 400 });
