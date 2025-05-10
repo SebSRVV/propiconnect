@@ -78,9 +78,11 @@ export default function ListingDetailClient() {
       const data = await res.json();
       if (res.ok) {
         setResenas(data.resenas || []);
+      } else {
+        console.error('Error al obtener reseñas:', data.message);
       }
     } catch (err) {
-      console.error('Error al cargar reseñas');
+      console.error('Error al cargar reseñas:', err);
     }
   };
 
