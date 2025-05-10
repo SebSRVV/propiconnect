@@ -29,17 +29,22 @@ export default function ListingsPage() {
   const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
 
   useEffect(() => {
-    // Obtener propiedades iniciales
+    // Cargar propiedades desde la API
     fetch('/api/listings')
       .then((res) => res.json())
       .then((data) => setPropiedades(data));
 
-    // Escuchar WebSocket
-    socket.on('nueva-propiedad', (nueva: Propiedad) => {
+    const handler = (nueva: Propiedad) => {
       setPropiedades((prev) => [nueva, ...prev]);
-    });
+    };
 
-    return () => socket.off('nueva-propiedad');
+    // Escuchar evento WebSocket
+    socket.on('nueva-propiedad', handler);
+
+    // Limpiar el listener al desmontar
+    return () => {
+      socket.off('nueva-propiedad', handler);
+    };
   }, []);
 
   return (
@@ -71,6 +76,7 @@ export default function ListingsPage() {
                     alt={prop.titulo}
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
+
                   <span
                     className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded uppercase tracking-wide
                       ${
@@ -89,6 +95,7 @@ export default function ListingsPage() {
                   <h3 className="text-lg font-bold text-white mb-1">{prop.titulo}</h3>
                   <p className="text-sm text-gray-400 mb-1">{prop.ubicacion}</p>
                   <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
+
                   <p className="text-xl font-semibold text-blue-400 mt-2">
                     ${prop.precio.toLocaleString()}
                     {prop.modo === 'alquiler' ? (
