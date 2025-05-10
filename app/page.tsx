@@ -9,7 +9,7 @@ export default function Home() {
           <h1 className="text-3xl font-bold text-white-500 tracking-tight">PROPICONNECT</h1>
           <nav className="space-x-4 text-sm">
             <Link href="/listings" className="text-gray-300 hover:text-blue-400 transition">Explorar</Link>
-            <Link href="/create-listing" className="text-gray-300 hover:text-blue-400 transition">Publicar</Link>
+            <Link href="/dashboard" className="text-gray-300 hover:text-blue-400 transition">Dashboard</Link>
             <Link href="/login" className="text-gray-400 hover:text-blue-300 transition">Iniciar Sesión</Link>
             <Link href="/register" className="text-gray-400 hover:text-blue-300 transition">Registrarse</Link>
           </nav>

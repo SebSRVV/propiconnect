@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaHome, FaFileAlt, FaMapMarkerAlt, FaDollarSign, FaImage } from 'react-icons/fa';
+import Link from 'next/link';
+import {
+  FaHome,
+  FaFileAlt,
+  FaMapMarkerAlt,
+  FaDollarSign,
+  FaImage,
+} from 'react-icons/fa';
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -18,7 +25,11 @@ export default function CreateListingPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -45,10 +56,19 @@ export default function CreateListingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center px-4">
-      <form onSubmit={handleSubmit} className="bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8 w-full max-w-lg space-y-5">
-        <h1 className="text-3xl font-bold text-center text-white mb-2">Publicar Propiedad</h1>
-        {error && <div className="bg-red-200 text-red-800 p-2 rounded text-sm">{error}</div>}
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center px-4 relative">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8 w-full max-w-lg space-y-5"
+      >
+        <h1 className="text-3xl font-bold text-center text-white mb-2">
+          Publicar Propiedad
+        </h1>
+        {error && (
+          <div className="bg-red-200 text-red-800 p-2 rounded text-sm">
+            {error}
+          </div>
+        )}
 
         <div className="flex items-center bg-gray-700 rounded px-3 py-2">
           <FaHome className="text-gray-300 mr-2" />
@@ -63,7 +83,12 @@ export default function CreateListingPage() {
         </div>
 
         <div className="bg-gray-700 rounded px-3 py-2">
-          <label htmlFor="descripcion" className="text-sm text-gray-300 block mb-1">Descripción</label>
+          <label
+            htmlFor="descripcion"
+            className="text-sm text-gray-300 block mb-1"
+          >
+            Descripción
+          </label>
           <textarea
             id="descripcion"
             name="descripcion"
@@ -150,6 +175,15 @@ export default function CreateListingPage() {
           {loading ? 'Publicando...' : 'Publicar propiedad'}
         </button>
       </form>
+
+      {/* Botón flotante para volver al Dashboard */}
+      <Link
+        href="/dashboard"
+        className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 transition"
+      >
+        <FaHome />
+        Dashboard
+      </Link>
     </div>
   );
 }

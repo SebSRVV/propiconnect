@@ -8,6 +8,7 @@ interface Propiedad {
   descripcion: string;
   precio: number;
   tipo: string;
+  modo: string;
   estado: string;
   imagenUrl?: string;
 }
@@ -42,7 +43,9 @@ export default async function ListingsPage() {
 
       <section className="max-w-6xl mx-auto py-12 px-6">
         {propiedades.length === 0 ? (
-          <p className="text-center text-gray-400">No hay propiedades disponibles en este momento.</p>
+          <p className="text-center text-gray-400">
+            No hay propiedades disponibles en este momento.
+          </p>
         ) : (
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {propiedades.map((prop) => (
@@ -53,16 +56,18 @@ export default async function ListingsPage() {
                     alt={prop.titulo}
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
-                  
-                  {/* Badge del estado */}
+
+                  {/* Estado badge */}
                   <span
-                    className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded
+                    className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded uppercase tracking-wide
                       ${
                         prop.estado === 'disponible'
-                          ? 'bg-green-700 text-green-300'
+                          ? 'bg-green-600 text-green-100'
                           : prop.estado === 'alquilada'
-                          ? 'bg-yellow-700 text-yellow-300'
-                          : 'bg-gray-700 text-gray-300'
+                          ? 'bg-yellow-600 text-yellow-100'
+                          : prop.estado === 'vendida'
+                          ? 'bg-red-600 text-red-100'
+                          : 'bg-gray-600 text-gray-100'
                       }
                     `}
                   >
@@ -72,7 +77,16 @@ export default async function ListingsPage() {
                   <h3 className="text-lg font-bold text-white mb-1">{prop.titulo}</h3>
                   <p className="text-sm text-gray-400 mb-1">{prop.ubicacion}</p>
                   <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
-                  <p className="text-blue-400 font-semibold text-md">${prop.precio.toLocaleString()}</p>
+
+                  {/* Precio mejorado */}
+                  <p className="text-xl font-semibold text-blue-400 mt-2">
+                    ${prop.precio.toLocaleString()}
+                    {prop.modo === 'alquiler' ? (
+                      <span className="text-sm text-gray-400"> / mes</span>
+                    ) : (
+                      <span className="text-sm text-gray-400"> USD</span>
+                    )}
+                  </p>
                 </div>
               </Link>
             ))}
