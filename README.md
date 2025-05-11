@@ -11,12 +11,10 @@
 - 📋 Registro e inicio de sesión para gestionar tus publicaciones.
 - ⚙️ Interfaz responsiva, ideal para móviles y escritorio.
 
-
 ## 🧱 Tecnologías utilizadas
 
 - [Next.js](https://nextjs.org/)
 - [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [React Icons](https://react-icons.github.io/react-icons/)
-
 

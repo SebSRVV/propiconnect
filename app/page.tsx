@@ -79,6 +79,7 @@ export default function Home() {
           src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
           alt="GitHub"
           className="w-8 h-8"
+          
         />
       </a>
     </main>
