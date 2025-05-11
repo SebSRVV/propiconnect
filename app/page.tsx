@@ -67,6 +67,20 @@ export default function Home() {
       <footer className="text-center text-sm text-white-500 py-6 bg-gray-800 border-t border-gray-700">
         © 2025 Proppiconnect. Todos los derechos reservados.
       </footer>
+            {/* Botón flotante de GitHub */}
+            <a
+        href="https://github.com/SebSRVV/propiconnect"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-17 right-6 w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-50"
+        title="Ver en GitHub"
+      >
+        <img
+          src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+          alt="GitHub"
+          className="w-8 h-8"
+        />
+      </a>
     </main>
   );
 }
