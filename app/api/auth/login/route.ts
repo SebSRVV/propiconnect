@@ -10,7 +10,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Email y contraseña son obligatorios' }, { status: 400 });
     }
 
-    const [rows]: any = await db.query('SELECT * FROM credencial WHERE email = ?', [email]);
+    // Obtener la credencial y el usuario asociado
+    const [rows]: any = await db.query(
+      `SELECT c.id AS credencialID, c.email, c.password, u.id AS usuarioID, u.tipoUsuario
+       FROM credencial c
+       JOIN usuario u ON c.id = u.credencialID
+       WHERE c.email = ?`,
+      [email]
+    );
 
     if (!rows.length) {
       return NextResponse.json({ message: 'Usuario no encontrado' }, { status: 401 });
@@ -23,13 +30,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Contraseña incorrecta' }, { status: 401 });
     }
 
+    // Crear sesión con todos los datos necesarios
+    const sessionData = {
+      id: user.credencialID,
+      email: user.email,
+      tipoUsuario: user.tipoUsuario,
+    };
+
     const response = NextResponse.json(
-      { message: 'Login exitoso', user: { id: user.id, email: user.email } },
+      { message: 'Login exitoso', user: sessionData },
       { status: 200 }
     );
 
-    // Guardar cookie de sesión (httpOnly)
-    response.cookies.set('session', JSON.stringify({ id: user.id, email: user.email }), {
+    // Guardar la sesión en cookie httpOnly
+    response.cookies.set('session', JSON.stringify(sessionData), {
       httpOnly: true,
       path: '/',
       sameSite: 'lax',

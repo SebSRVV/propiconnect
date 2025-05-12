@@ -1,70 +1,26 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import cookie from 'cookie';
 
-export async function POST(req: Request) {
+export async function GET() {
   try {
-    const { titulo, descripcion, ubicacion, precio, tipo, modo, imagenUrl } = await req.json();
+    // Consulta todas las propiedades con datos relevantes
+    const [rows]: any = await db.query(`
+      SELECT 
+        id, 
+        titulo, 
+        descripcion, 
+        ubicacion, 
+        precio, 
+        tipo, 
+        modo, 
+        estado, 
+        imagenUrl 
+      FROM propiedad
+    `);
 
-    // Validar campos obligatorios
-    if (!titulo || !descripcion || !ubicacion || !precio || !tipo || !modo) {
-      return NextResponse.json({ message: 'Faltan datos obligatorios' }, { status: 400 });
-    }
-
-    // Leer cookie de sesión de forma segura
-    const cookieHeader = req.headers.get('cookie') || '';
-    const cookiesParsed = cookie.parse(cookieHeader);
-    const session = cookiesParsed.session;
-
-    if (!session) {
-      return NextResponse.json({ message: 'No autorizado' }, { status: 401 });
-    }
-
-    let user;
-    try {
-      user = JSON.parse(session);
-    } catch {
-      return NextResponse.json({ message: 'Sesión inválida' }, { status: 401 });
-    }
-
-    const credencialID = user.id;
-
-    // Verificar que el usuario exista y sea Propietario
-    const [rows]: any = await db.query(
-      'SELECT id, tipoUsuario FROM usuario WHERE credencialID = ?',
-      [credencialID]
-    );
-
-    if (!rows.length) {
-      return NextResponse.json({ message: 'Usuario no encontrado' }, { status: 404 });
-    }
-
-    const usuario = rows[0];
-
-    if (usuario.tipoUsuario !== 'Propietario') {
-      return NextResponse.json({ message: 'Solo los propietarios pueden publicar propiedades' }, { status: 403 });
-    }
-
-    // Insertar propiedad
-    await db.query(
-      `INSERT INTO propiedad (titulo, descripcion, ubicacion, precio, tipo, modo, imagenUrl, propietarioID)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        titulo,
-        descripcion,
-        ubicacion,
-        precio,
-        tipo,
-        modo,
-        imagenUrl || null,
-        usuario.id,
-      ]
-    );
-
-    return NextResponse.json({ message: 'Propiedad publicada exitosamente' }, { status: 201 });
-
+    return NextResponse.json(rows, { status: 200 });
   } catch (error) {
-    console.error('[CREAR_PROPIEDAD_ERROR]', error);
-    return NextResponse.json({ message: 'Error del servidor' }, { status: 500 });
+    console.error('[LISTAR_PROPIEDADES_ERROR]', error);
+    return NextResponse.json({ message: 'Error al obtener propiedades' }, { status: 500 });
   }
 }

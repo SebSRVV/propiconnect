@@ -47,10 +47,8 @@ export default function ListingDetailClient() {
   const router = useRouter();
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [error, setError] = useState('');
-
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
-
   const [reseña, setReseña] = useState('');
   const [resenas, setResenas] = useState<Resena[]>([]);
 
@@ -127,7 +125,7 @@ export default function ListingDetailClient() {
 
       alert('Gracias por tu reseña.');
       setReseña('');
-      fetchResenas(); // Actualizar lista
+      fetchResenas();
     } catch (err) {
       alert('Hubo un error al enviar la reseña.');
     }
@@ -161,23 +159,25 @@ export default function ListingDetailClient() {
           />
 
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <FaHome className="text-blue-400" />
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white flex items-center gap-3">
+              <FaHome className="text-blue-400 text-2xl" />
               {prop.titulo}
             </h1>
 
             <div className="flex flex-wrap gap-4 text-sm text-gray-300 mt-2">
-              <span className="flex items-center gap-1">
-                <FaMapMarkerAlt className="text-blue-300" /> {prop.ubicacion}
+              <span className="flex items-center gap-2">
+                <FaMapMarkerAlt className="text-red-400" />
+                <span>{prop.ubicacion}</span>
               </span>
-              <span className="flex items-center gap-1 capitalize">
-                <FaTags className="text-blue-300" /> {prop.tipo}
+              <span className="flex items-center gap-2 capitalize">
+                <FaHome className="text-yellow-400" />
+                <span>{prop.tipo}</span>
               </span>
-              <span className="flex items-center gap-1 capitalize">
+              <span className="flex items-center gap-2 capitalize">
                 <FaClipboardList className="text-blue-300" /> {prop.modo}
               </span>
               <span
-                className={`flex items-center gap-1 font-semibold ${
+                className={`flex items-center gap-2 font-semibold ${
                   prop.estado === 'disponible'
                     ? 'text-green-400'
                     : prop.estado === 'alquilada'
@@ -193,21 +193,21 @@ export default function ListingDetailClient() {
 
           <hr className="border-gray-600" />
 
-          <p className="text-xl font-semibold text-blue-400 flex items-center gap-2">
-            <GrMoney />
-            S/.{prop.precio.toLocaleString()}
-            {prop.modo === 'alquiler' ? (
-              <span className="text-sm text-gray-400 ml-1"> / mes</span>
-            ) : (
-              <span className="text-sm text-gray-400 ml-1"> PEN</span>
-            )}
-          </p>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Descripción</h2>
-            <p className="text-gray-300 leading-relaxed whitespace-pre-line">
-              {prop.descripcion}
+          <div className="flex items-center justify-between text-lg mt-4">
+            <p className="text-blue-400 font-bold flex items-center gap-2">
+              <GrMoney className="text-xl" />
+              S/.{prop.precio.toLocaleString()}
+              <span className="text-sm text-gray-400 ml-1">
+                {prop.modo === 'alquiler' ? '/ mes' : 'PEN'}
+              </span>
             </p>
+          </div>
+
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold text-white mb-2">Descripción</h2>
+            <div className="bg-gray-700 text-gray-300 p-4 rounded-md leading-relaxed whitespace-pre-line">
+              {prop.descripcion}
+            </div>
           </div>
 
           {prop.estado === 'disponible' && (
@@ -247,17 +247,18 @@ export default function ListingDetailClient() {
             </div>
           )}
 
-          {/* Sección de Reseñas */}
-          <section className="mt-12 bg-gray-800 border border-gray-700 rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4 text-white">Reseñas</h2>
+          <section className="mt-12">
+            <h2 className="text-2xl font-bold text-white mb-4">Reseñas</h2>
 
             {resenas.length === 0 ? (
-              <p className="text-gray-400 text-sm">Aún no hay reseñas para esta propiedad.</p>
+              <p className="text-gray-400 text-sm mb-6">
+                Aún no hay reseñas para esta propiedad.
+              </p>
             ) : (
               <div className="space-y-4 mb-6">
                 {resenas.map((review) => (
-                  <div key={review.id} className="bg-gray-700 p-4 rounded-md">
-                    <p className="text-sm text-gray-300 italic">"{review.comentario}"</p>
+                  <div key={review.id} className="bg-gray-700 p-4 rounded-md border border-gray-600">
+                    <p className="text-sm text-gray-200 italic">"{review.comentario}"</p>
                     <p className="text-xs text-right text-gray-400 mt-2">
                       – {review.nombre}, {new Date(review.fechaCreacion).toLocaleDateString('es-ES')}
                     </p>
@@ -266,14 +267,14 @@ export default function ListingDetailClient() {
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="bg-gray-700 border border-gray-600 p-4 rounded-md space-y-3">
               <label htmlFor="review" className="block text-sm text-gray-300 font-medium">
                 Escribe tu reseña:
               </label>
               <textarea
                 id="review"
-                rows={4}
-                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                rows={3}
+                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white"
                 placeholder="Comparte tu experiencia..."
                 value={reseña}
                 onChange={(e) => setReseña(e.target.value)}

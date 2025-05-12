@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   FaHome,
-  FaFileAlt,
   FaMapMarkerAlt,
   FaDollarSign,
   FaImage,
@@ -13,6 +12,7 @@ import {
 
 export default function CreateListingPage() {
   const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [form, setForm] = useState({
     titulo: '',
     descripcion: '',
@@ -24,6 +24,26 @@ export default function CreateListingPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // 🔐 Bloquea acceso si no es propietario
+  useEffect(() => {
+    try {
+      const sessionString = localStorage.getItem('session');
+      if (!sessionString) {
+        router.replace('/no-autorizado');
+        return;
+      }
+
+      const session = JSON.parse(sessionString);
+      if (session.tipoUsuario !== 'Propietario') {
+        router.replace('/no-autorizado');
+      } else {
+        setCheckingAuth(false); // todo bien
+      }
+    } catch {
+      router.replace('/no-autorizado');
+    }
+  }, [router]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -39,10 +59,10 @@ export default function CreateListingPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/propiedad', {
+      const res = await fetch('/api/create-listings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, precio: Number(form.precio) }),
       });
 
       const data = await res.json();
@@ -55,15 +75,24 @@ export default function CreateListingPage() {
     }
   };
 
+  if (checkingAuth) {
+    return (
+      <div className="text-white text-center mt-10">
+        Verificando acceso...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white flex items-center justify-center px-4 relative">
       <form
         onSubmit={handleSubmit}
         className="bg-gray-800 border border-gray-700 shadow-xl rounded-lg p-8 w-full max-w-lg space-y-5"
       >
-        <h1 className="text-3xl font-bold text-center text-white mb-2">
+        <h1 className="text-3xl font-bold text-center mb-2">
           Publicar Propiedad
         </h1>
+
         {error && (
           <div className="bg-red-200 text-red-800 p-2 rounded text-sm">
             {error}
@@ -82,23 +111,15 @@ export default function CreateListingPage() {
           />
         </div>
 
-        <div className="bg-gray-700 rounded px-3 py-2">
-          <label
-            htmlFor="descripcion"
-            className="text-sm text-gray-300 block mb-1"
-          >
-            Descripción
-          </label>
-          <textarea
-            id="descripcion"
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            required
-            rows={3}
-            className="w-full bg-transparent text-white resize-none focus:outline-none"
-          />
-        </div>
+        <textarea
+          name="descripcion"
+          value={form.descripcion}
+          onChange={handleChange}
+          required
+          rows={3}
+          placeholder="Descripción"
+          className="w-full bg-gray-700 text-white p-2 rounded resize-none focus:outline-none"
+        />
 
         <div className="flex items-center bg-gray-700 rounded px-3 py-2">
           <FaMapMarkerAlt className="text-gray-300 mr-2" />
@@ -122,36 +143,31 @@ export default function CreateListingPage() {
             required
             placeholder="Precio"
             className="w-full bg-transparent text-white focus:outline-none"
+            min="0"
           />
         </div>
 
         <div className="flex gap-4">
-          <div className="w-1/2">
-            <label className="text-sm text-gray-300 block mb-1">Tipo</label>
-            <select
-              name="tipo"
-              value={form.tipo}
-              onChange={handleChange}
-              className="w-full bg-gray-700 text-white p-2 rounded focus:outline-none"
-            >
-              <option value="casa">Casa</option>
-              <option value="departamento">Departamento</option>
-              <option value="habitacion">Habitación</option>
-            </select>
-          </div>
+          <select
+            name="tipo"
+            value={form.tipo}
+            onChange={handleChange}
+            className="w-1/2 bg-gray-700 text-white p-2 rounded"
+          >
+            <option value="casa">Casa</option>
+            <option value="departamento">Departamento</option>
+            <option value="habitacion">Habitación</option>
+          </select>
 
-          <div className="w-1/2">
-            <label className="text-sm text-gray-300 block mb-1">Modo</label>
-            <select
-              name="modo"
-              value={form.modo}
-              onChange={handleChange}
-              className="w-full bg-gray-700 text-white p-2 rounded focus:outline-none"
-            >
-              <option value="alquiler">Alquiler</option>
-              <option value="venta">Venta</option>
-            </select>
-          </div>
+          <select
+            name="modo"
+            value={form.modo}
+            onChange={handleChange}
+            className="w-1/2 bg-gray-700 text-white p-2 rounded"
+          >
+            <option value="alquiler">Alquiler</option>
+            <option value="venta">Venta</option>
+          </select>
         </div>
 
         <div className="flex items-center bg-gray-700 rounded px-3 py-2">
@@ -176,7 +192,6 @@ export default function CreateListingPage() {
         </button>
       </form>
 
-      {/* Botón flotante para volver al Dashboard */}
       <Link
         href="/dashboard"
         className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 transition"
