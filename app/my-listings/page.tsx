@@ -1,9 +1,8 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-import db from '@/lib/db';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
-import { GrMoney } from "react-icons/gr";
+import { GrMoney } from 'react-icons/gr';
 
 interface Propiedad {
   id: number;
@@ -13,6 +12,7 @@ interface Propiedad {
   precio: number;
   tipo: string;
   estado: string;
+  propietarioId: number;
   imagenUrl?: string;
 }
 
@@ -26,15 +26,36 @@ function getImagenPorTipo(tipo: string) {
   return tipos[tipo.toLowerCase()] || '/casa.jpg';
 }
 
-export default async function ListingsPage() {
-  const [rows]: any = await db.query('SELECT * FROM propiedad');
-  const propiedades: Propiedad[] = rows;
+export default function ListingsPage() {
+  const [propiedades, setPropiedades] = useState<Propiedad[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPropiedades = async () => {
+      try {
+        const res = await fetch('/api/delete-listings'); // ← Solo propiedades del usuario
+
+        if (!res.ok) {
+          throw new Error('No autorizado o error al cargar propiedades');
+        }
+
+        const data = await res.json();
+        setPropiedades(data);
+      } catch (error) {
+        console.error('Error cargando propiedades:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPropiedades();
+  }, []);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold">Explorar Propiedades</h1>
+          <h1 className="text-3xl font-bold">Mis Propiedades</h1>
           <Link
             href="/dashboard"
             className="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow-md transition"
@@ -45,10 +66,10 @@ export default async function ListingsPage() {
       </header>
 
       <section className="max-w-6xl mx-auto py-12 px-6">
-        {propiedades.length === 0 ? (
-          <p className="text-center text-gray-400">
-            No hay propiedades disponibles en este momento.
-          </p>
+        {loading ? (
+          <p className="text-center text-gray-400">Cargando tus propiedades...</p>
+        ) : propiedades.length === 0 ? (
+          <p className="text-center text-gray-400">No has publicado propiedades aún.</p>
         ) : (
           <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {propiedades.map((prop) => (
@@ -60,7 +81,6 @@ export default async function ListingsPage() {
                     className="w-full h-48 object-cover rounded-md mb-4"
                   />
 
-                  {/* Estado badge */}
                   <span
                     className={`absolute top-4 left-4 text-xs font-semibold px-2 py-1 rounded uppercase tracking-wide
                       ${
@@ -82,7 +102,8 @@ export default async function ListingsPage() {
                   <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
 
                   <p className="text-xl font-semibold text-blue-400 mt-2">
-                    S/.{prop.precio.toLocaleString()} <span className="text-sm text-gray-400">PEN</span>
+                    S/.{prop.precio.toLocaleString()}{' '}
+                    <span className="text-sm text-gray-400">PEN</span>
                   </p>
                 </div>
               </Link>

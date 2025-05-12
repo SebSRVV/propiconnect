@@ -26,7 +26,15 @@ export default function ClientWrapper({
   return (
     <main className="min-h-screen bg-gray-900 text-white">
       <header className="bg-gray-800 px-6 py-6 shadow">
-        <h1 className="text-3xl font-bold text-center">Mis Propiedades</h1>
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Mis Propiedades</h1>
+          <Link
+            href="/dashboard"
+            className="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow transition"
+          >
+            Volver al Dashboard
+          </Link>
+        </div>
       </header>
 
       <section className="max-w-6xl mx-auto py-12 px-6">
@@ -45,6 +53,9 @@ export default function ClientWrapper({
           </div>
         )}
       </section>
+      <footer className="text-center text-sm text-white-500 py-6 bg-gray-800 border-t border-gray-700">
+        © 2025 Proppiconnect. Todos los derechos reservados.
+      </footer>
     </main>
   );
 }
