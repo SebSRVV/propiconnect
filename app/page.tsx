@@ -2,13 +2,16 @@ export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { FaSearch, FaHome, FaUserPlus, FaMoneyCheckAlt } from "react-icons/fa";
-
+// arreglar boton publicar para usuarios 
 export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-white-500 tracking-tight">PROPICONNECT</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 text-transparent bg-clip-text tracking-wide">
+  PROPICONNECT
+</h1>
+
           <nav className="space-x-4 text-sm">
             <Link href="/listings" className="text-gray-300 hover:text-blue-400 transition">Explorar</Link>
             <Link href="/dashboard" className="text-gray-300 hover:text-blue-400 transition">Dashboard</Link>
@@ -30,8 +33,8 @@ export default function Home() {
             </button>
           </Link>
           <Link href="/create-listing">
-            <button className="flex items-center gap-2 border border-blue-400 text-blue-400 px-6 py-3 rounded-md hover:bg-blue-500 hover:text-white transition">
-              <FaHome /> Publicar propiedad
+            <button className="flex items-center gap-2 border border-blue-400 text-blue-400 px-6 py-3 rounded-md hover:bg-blue-500 hover:text-white transition"> 
+              <FaHome /> Publicar propiedad 
             </button>
           </Link>
         </div>

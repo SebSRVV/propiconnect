@@ -12,7 +12,7 @@ import {
   FaHandshake,
   FaCalendarAlt,
 } from 'react-icons/fa';
-import { GrMoney } from "react-icons/gr";
+import { GrMoney } from 'react-icons/gr';
 
 interface Propiedad {
   id: number;
@@ -45,6 +45,8 @@ function getImagenPorTipo(tipo: string) {
 export default function ListingDetailClient() {
   const { id } = useParams();
   const router = useRouter();
+
+  const [userSession, setUserSession] = useState<any>(null);
   const [propiedad, setPropiedad] = useState<Propiedad | null>(null);
   const [error, setError] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
@@ -52,6 +54,24 @@ export default function ListingDetailClient() {
   const [reseña, setReseña] = useState('');
   const [resenas, setResenas] = useState<Resena[]>([]);
 
+  // Verificación de sesión
+  useEffect(() => {
+    const sessionData = localStorage.getItem('session');
+    if (!sessionData) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(sessionData);
+      setUserSession(parsed);
+    } catch (error) {
+      localStorage.removeItem('session');
+      router.push('/login');
+    }
+  }, []);
+
+  // Cargar datos de propiedad y reseñas
   useEffect(() => {
     if (id) {
       fetchPropiedad();
@@ -113,6 +133,7 @@ export default function ListingDetailClient() {
         body: JSON.stringify({
           propiedadID: Number(id),
           comentario: reseña,
+          nombre: userSession?.nombres || 'Anónimo', // si tu backend lo acepta
         }),
       });
 
@@ -130,6 +151,14 @@ export default function ListingDetailClient() {
       alert('Hubo un error al enviar la reseña.');
     }
   };
+
+  if (!userSession) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        <p className="text-xl text-gray-300">Verificando sesión...</p>
+      </main>
+    );
+  }
 
   if (error) {
     return <p className="text-red-400 text-center mt-10">{error}</p>;
@@ -167,11 +196,11 @@ export default function ListingDetailClient() {
             <div className="flex flex-wrap gap-4 text-sm text-gray-300 mt-2">
               <span className="flex items-center gap-2">
                 <FaMapMarkerAlt className="text-red-400" />
-                <span>{prop.ubicacion}</span>
+                {prop.ubicacion}
               </span>
               <span className="flex items-center gap-2 capitalize">
                 <FaHome className="text-yellow-400" />
-                <span>{prop.tipo}</span>
+                {prop.tipo}
               </span>
               <span className="flex items-center gap-2 capitalize">
                 <FaClipboardList className="text-blue-300" /> {prop.modo}
@@ -257,10 +286,14 @@ export default function ListingDetailClient() {
             ) : (
               <div className="space-y-4 mb-6">
                 {resenas.map((review) => (
-                  <div key={review.id} className="bg-gray-700 p-4 rounded-md border border-gray-600">
+                  <div
+                    key={review.id}
+                    className="bg-gray-700 p-4 rounded-md border border-gray-600"
+                  >
                     <p className="text-sm text-gray-200 italic">"{review.comentario}"</p>
                     <p className="text-xs text-right text-gray-400 mt-2">
-                      – {review.nombre}, {new Date(review.fechaCreacion).toLocaleDateString('es-ES')}
+                      – {review.nombre},{' '}
+                      {new Date(review.fechaCreacion).toLocaleDateString('es-ES')}
                     </p>
                   </div>
                 ))}
