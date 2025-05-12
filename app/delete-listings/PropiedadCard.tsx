@@ -23,7 +23,15 @@ function getImagenPorTipo(tipo: string) {
   return tipos[tipo.toLowerCase()] || '/casa.jpg';
 }
 
-export default function PropiedadCard({ prop, onDelete }: { prop: Propiedad; onDelete: (id: number) => void }) {
+export default function PropiedadCard({
+  prop,
+  onDelete,
+  puedeEliminar = false,
+}: {
+  prop: Propiedad;
+  onDelete: (id: number) => void;
+  puedeEliminar?: boolean;
+}) {
   const handleDelete = async () => {
     const confirmDelete = confirm(`¿Estás seguro de que quieres eliminar "${prop.titulo}"?`);
     if (!confirmDelete) return;
@@ -71,12 +79,14 @@ export default function PropiedadCard({ prop, onDelete }: { prop: Propiedad; onD
         S/.{prop.precio.toLocaleString()} <span className="text-sm text-gray-400">PEN</span>
       </p>
 
-      <button
-        onClick={handleDelete}
-        className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
-      >
-        Eliminar
-      </button>
+      {puedeEliminar && (
+        <button
+          onClick={handleDelete}
+          className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition"
+        >
+          Eliminar
+        </button>
+      )}
     </div>
   );
 }
