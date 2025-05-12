@@ -37,6 +37,13 @@ export default function LoginPage() {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
 
+      // ✅ GUARDAR SESIÓN EN LOCALSTORAGE
+      if (data.user) {
+        localStorage.setItem('session', JSON.stringify(data.user));
+      } else {
+        throw new Error('Usuario inválido en la respuesta');
+      }
+
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Error desconocido');
