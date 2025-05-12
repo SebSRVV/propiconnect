@@ -25,7 +25,7 @@ export default function NoAutorizadoPage() {
         Cerraste sesión con éxito.
       </p>
       <form
-  action="/logout"
+  action="/"
   method="POST"
   onSubmit={() => {
     localStorage.removeItem('session');
