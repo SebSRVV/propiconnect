@@ -1,43 +1,42 @@
-export const dynamic = 'force-dynamic';
-import LogoutButton from '../components/LogoutButton';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import db from '@/lib/db';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   FaUserCircle,
   FaHome,
   FaMoneyBill,
   FaPlus,
   FaClipboardList,
-  FaEdit,
   FaTrash,
 } from 'react-icons/fa';
 import Link from 'next/link';
+import LogoutButton from '../components/LogoutButton';
 
-export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get('session');
+export default function DashboardPage() {
+  const router = useRouter();
+  const [userSession, setUserSession] = useState<any>(null);
 
-  if (!session) redirect('/login');
+  useEffect(() => {
+    const sessionData = localStorage.getItem('session');
+    if (!sessionData) {
+      router.push('/login');
+      return;
+    }
 
-  let userSession;
-  try {
-    userSession = JSON.parse(session.value);
-  } catch {
-    redirect('/login');
-  }
+    try {
+      const parsed = JSON.parse(sessionData);
+      setUserSession(parsed);
+    } catch (error) {
+      localStorage.removeItem('session');
+      router.push('/login');
+    }
+  }, []);
 
-  const credencialID = userSession.id;
+  if (!userSession) return null; // o un loading spinner
 
-  const [rows]: any = await db.query(
-    'SELECT nombres, apellidos, tipoUsuario, telefono FROM usuario WHERE credencialID = ?',
-    [credencialID]
-  );
-
-  if (!rows.length) redirect('/login');
-
-  const user = rows[0];
-  const isOwner = user.tipoUsuario === 'Propietario';
+  const { nombres, apellidos, telefono, tipoUsuario, email } = userSession;
+  const isOwner = tipoUsuario === 'Propietario';
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
@@ -56,24 +55,25 @@ export default async function DashboardPage() {
 
       {/* Perfil */}
       <section className="max-w-6xl mx-auto mt-10 px-6">
-  <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-md flex justify-between items-center">
-    <div className="flex items-center gap-6">
-      <div className="bg-blue-900 text-blue-400 p-4 rounded-full">
-        <FaUserCircle size={48} />
-      </div>
-      <div>
-        <h2 className="text-2xl font-semibold text-white mb-1">
-          {user.nombres} {user.apellidos}
-        </h2>
-        <p className="text-gray-300 text-sm">Teléfono: {user.telefono}</p>
-        <p className="text-gray-300 text-sm">Rol: <span className="font-semibold">{user.tipoUsuario}</span></p>
-        <p className="text-gray-300 text-sm">Correo: {userSession.email}</p>
-      </div>
-    </div>
-    <LogoutButton />
-  </div>
-</section>
-
+        <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-md flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            <div className="bg-blue-900 text-blue-400 p-4 rounded-full">
+              <FaUserCircle size={48} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-semibold text-white mb-1">
+                {nombres} {apellidos}
+              </h2>
+              <p className="text-gray-300 text-sm">Teléfono: {telefono}</p>
+              <p className="text-gray-300 text-sm">
+                Rol: <span className="font-semibold">{tipoUsuario}</span>
+              </p>
+              <p className="text-gray-300 text-sm">Correo: {email}</p>
+            </div>
+          </div>
+          <LogoutButton />
+        </div>
+      </section>
 
       {/* Acciones */}
       <section className="max-w-6xl mx-auto py-16 px-6">
