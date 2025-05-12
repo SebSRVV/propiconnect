@@ -86,7 +86,7 @@ export default async function ListingsPage() {
                     {prop.modo === 'alquiler' ? (
                       <span className="text-sm text-gray-400"> / mes</span>
                     ) : (
-                      <span className="text-sm text-gray-400"> USD</span>
+                      <span className="text-sm text-gray-400"> PEN</span>
                     )}
                   </p>
                 </div>
