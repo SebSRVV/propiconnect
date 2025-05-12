@@ -10,6 +10,17 @@ import {
   FaUserPlus,
   FaCheckCircle,
   FaTrash,
+  FaMapMarkerAlt,
+  FaHome,
+  FaTag,
+  FaList,
+  FaUsers,
+  FaMoneyBillWave,
+  FaClock,
+  FaEnvelope,
+  FaExclamationTriangle,
+  FaArrowLeft,
+  FaClipboardCheck,
 } from 'react-icons/fa';
 
 interface Propiedad {
@@ -142,7 +153,7 @@ export default function CheckoutPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
-        Cargando propiedad...
+        <FaClock className="mr-2 animate-spin" /> Cargando propiedad...
       </div>
     );
   }
@@ -150,7 +161,7 @@ export default function CheckoutPage() {
   if (error || !propiedad) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
-        Error: {error}
+        <FaExclamationTriangle className="mr-2 text-red-400" /> Error: {error}
       </div>
     );
   }
@@ -161,12 +172,14 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white">
       <header className="bg-gray-800 border-b border-gray-700 shadow">
         <div className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Checkout de Item {propiedad.id}</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <FaClipboardCheck /> Checkout de Propiedad #{propiedad.id}
+          </h1>
           <button
             onClick={() => router.push('/listings')}
-            className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+            className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm flex items-center gap-2"
           >
-            ← Volver a la lista
+            <FaArrowLeft /> Volver a la lista
           </button>
         </div>
       </header>
@@ -176,38 +189,39 @@ export default function CheckoutPage() {
           <img src={imagen} alt={propiedad.titulo} className="w-full h-64 object-cover rounded-t-lg" />
 
           <div className="p-6 space-y-6">
-            <h2 className="text-2xl font-bold">{propiedad.titulo}</h2>
-            <p className="text-sm text-gray-400">{propiedad.ubicacion}</p>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <FaHome /> {propiedad.titulo}
+            </h2>
+            <p className="text-sm text-gray-400 flex items-center gap-2">
+              <FaMapMarkerAlt /> {propiedad.ubicacion}
+            </p>
 
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
-                <p className="text-sm text-gray-500">Tipo</p>
+                <p className="text-sm text-gray-500 flex items-center gap-1"><FaTag /> Tipo</p>
                 <p className="capitalize">{propiedad.tipo}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Modo</p>
+                <p className="text-sm text-gray-500 flex items-center gap-1"><FaList /> Modo</p>
                 <p className="capitalize">{propiedad.modo}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Precio total</p>
+                <p className="text-sm text-gray-500 flex items-center gap-1"><FaMoneyBillWave /> Precio total</p>
                 <p className="text-blue-400 font-semibold">
-                  <FaDollarSign className="inline mb-1" /> {propiedad.precio.toLocaleString()}
+                  S/. {propiedad.precio.toLocaleString()}
                 </p>
               </div>
               {fecha && (
                 <div>
-                  <p className="text-sm text-gray-500">Fecha de inicio</p>
-                  <p className="flex items-center gap-2">
-                    <FaCalendarAlt /> {fecha}
-                  </p>
+                  <p className="text-sm text-gray-500 flex items-center gap-1"><FaCalendarAlt /> Fecha de inicio</p>
+                  <p className="flex items-center gap-2">{fecha}</p>
                 </div>
               )}
             </div>
 
-            {/* División de pagos */}
             <div className="bg-gray-700 p-4 rounded-md space-y-4">
               <h3 className="font-semibold text-lg flex items-center gap-2">
-                <FaUserPlus /> División de pagos
+                <FaUsers /> División de pagos
               </h3>
 
               <div className="flex gap-4 flex-wrap sm:flex-nowrap">
@@ -229,7 +243,7 @@ export default function CheckoutPage() {
                   onClick={handleAgregar}
                   className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
                 >
-                  Agregar
+                  <FaUserPlus className="inline" /> Agregar
                 </button>
               </div>
 
@@ -241,7 +255,7 @@ export default function CheckoutPage() {
                       className="flex justify-between items-center bg-gray-800 px-3 py-2 rounded"
                     >
                       <span>
-                        {p.email} — ${p.monto.toFixed(2)}
+                        <FaEnvelope className="inline mr-1" /> {p.email} — S/. {p.monto.toFixed(2)}
                       </span>
                       <button
                         onClick={() => handleEliminar(i)}
@@ -258,30 +272,31 @@ export default function CheckoutPage() {
                 <p>
                   Total aportado:{' '}
                   <span className="text-white font-semibold">
-                    ${totalAportado.toFixed(2)}
+                    S/. {totalAportado.toFixed(2)}
                   </span>
                 </p>
                 <p>
                   Restante:{' '}
                   <span className={restante > 0 ? 'text-red-400' : 'text-green-400'}>
-                    ${restante.toFixed(2)}
+                    S/. {restante.toFixed(2)}
                   </span>
                 </p>
               </div>
             </div>
 
             {mensaje && (
-              <div className="text-sm text-red-400">{mensaje}</div>
+              <div className="text-sm text-red-400 flex items-center gap-2">
+                <FaExclamationTriangle /> {mensaje}
+              </div>
             )}
 
-            {/* Confirmación */}
             {resultado ? (
               <div className="bg-green-800 p-4 rounded-md border border-green-500 text-sm mt-4 space-y-2">
                 <p className="flex items-center gap-2">
                   <FaCheckCircle /> {resultado.message}
                 </p>
-                <p>Grupo ID: {resultado.grupoID}</p>
-                <p>Reserva ID: {resultado.reservaID}</p>
+                <p><strong>Grupo ID:</strong> {resultado.grupoID}</p>
+                <p><strong>Reserva ID:</strong> {resultado.reservaID}</p>
                 <button
                   className="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"
                   onClick={() => router.push('/dashboard')}

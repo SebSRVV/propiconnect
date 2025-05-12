@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-
+import LogoutButton from '../components/LogoutButton';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import db from '@/lib/db';
@@ -56,20 +56,24 @@ export default async function DashboardPage() {
 
       {/* Perfil */}
       <section className="max-w-6xl mx-auto mt-10 px-6">
-        <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-md flex items-center gap-6">
-          <div className="bg-blue-900 text-blue-400 p-4 rounded-full">
-            <FaUserCircle size={48} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-semibold text-white mb-1">
-              {user.nombres} {user.apellidos}
-            </h2>
-            <p className="text-gray-300 text-sm">Teléfono: {user.telefono}</p>
-            <p className="text-gray-300 text-sm">Rol: <span className="font-semibold">{user.tipoUsuario}</span></p>
-            <p className="text-gray-300 text-sm">Correo: {userSession.email}</p>
-          </div>
-        </div>
-      </section>
+  <div className="bg-gray-800 border border-gray-700 p-6 rounded-lg shadow-md flex justify-between items-center">
+    <div className="flex items-center gap-6">
+      <div className="bg-blue-900 text-blue-400 p-4 rounded-full">
+        <FaUserCircle size={48} />
+      </div>
+      <div>
+        <h2 className="text-2xl font-semibold text-white mb-1">
+          {user.nombres} {user.apellidos}
+        </h2>
+        <p className="text-gray-300 text-sm">Teléfono: {user.telefono}</p>
+        <p className="text-gray-300 text-sm">Rol: <span className="font-semibold">{user.tipoUsuario}</span></p>
+        <p className="text-gray-300 text-sm">Correo: {userSession.email}</p>
+      </div>
+    </div>
+    <LogoutButton />
+  </div>
+</section>
+
 
       {/* Acciones */}
       <section className="max-w-6xl mx-auto py-16 px-6">
