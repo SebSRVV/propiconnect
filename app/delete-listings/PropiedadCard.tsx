@@ -68,7 +68,7 @@ export default function PropiedadCard({ prop, onDelete }: { prop: Propiedad; onD
       <p className="text-sm text-gray-400 capitalize mb-1">{prop.tipo}</p>
 
       <p className="text-xl font-semibold text-blue-400 mt-2">
-        ${prop.precio.toLocaleString()} <span className="text-sm text-gray-400">USD</span>
+        S/.{prop.precio.toLocaleString()} <span className="text-sm text-gray-400">PEN</span>
       </p>
 
       <button

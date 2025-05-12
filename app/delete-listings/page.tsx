@@ -11,6 +11,7 @@ interface Propiedad {
   precio: number;
   tipo: string;
   estado: string;
+  propietarioId: number;
   imagenUrl?: string;
 }
 

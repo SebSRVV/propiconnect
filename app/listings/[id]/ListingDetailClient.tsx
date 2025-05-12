@@ -6,13 +6,13 @@ import Link from 'next/link';
 import {
   FaMapMarkerAlt,
   FaHome,
-  FaDollarSign,
   FaTags,
   FaClipboardList,
   FaShoppingCart,
   FaHandshake,
   FaCalendarAlt,
 } from 'react-icons/fa';
+import { GrMoney } from "react-icons/gr";
 
 interface Propiedad {
   id: number;
@@ -194,12 +194,12 @@ export default function ListingDetailClient() {
           <hr className="border-gray-600" />
 
           <p className="text-xl font-semibold text-blue-400 flex items-center gap-2">
-            <FaDollarSign />
-            ${prop.precio.toLocaleString()}
+            <GrMoney />
+            S/.{prop.precio.toLocaleString()}
             {prop.modo === 'alquiler' ? (
               <span className="text-sm text-gray-400 ml-1"> / mes</span>
             ) : (
-              <span className="text-sm text-gray-400 ml-1"> USD</span>
+              <span className="text-sm text-gray-400 ml-1"> PEN</span>
             )}
           </p>
 
