@@ -1,26 +1,20 @@
+import path from 'path';
+import { promises as fs } from 'fs';
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
 
+// 👇 Este es el cambio importante: exportar "GET"
 export async function GET() {
   try {
-    // Consulta todas las propiedades con datos relevantes
-    const [rows]: any = await db.query(`
-      SELECT 
-        id, 
-        titulo, 
-        descripcion, 
-        ubicacion, 
-        precio, 
-        tipo, 
-        modo, 
-        estado, 
-        imagenUrl 
-      FROM propiedad
-    `);
+    const filePath = path.join(process.cwd(), 'data', 'propiedades.json');
+    const jsonData = await fs.readFile(filePath, 'utf8');
+    const propiedades = JSON.parse(jsonData);
 
-    return NextResponse.json(rows, { status: 200 });
+    return NextResponse.json(propiedades, { status: 200 });
   } catch (error) {
-    console.error('[LISTAR_PROPIEDADES_ERROR]', error);
-    return NextResponse.json({ message: 'Error al obtener propiedades' }, { status: 500 });
+    console.error('Error leyendo propiedades.json:', error);
+    return NextResponse.json(
+      { mensaje: 'Error al leer propiedades' },
+      { status: 500 }
+    );
   }
 }

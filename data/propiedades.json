@@ -1,0 +1,222 @@
+[
+  {
+    "id": 1,
+    "titulo": "Casa familiar en Surco",
+    "ubicacion": "Santiago de Surco, Lima",
+    "descripcion": "Casa amplia con jardín y cochera para 2 autos.",
+    "precio": 450000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "disponible",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 2,
+    "titulo": "Departamento moderno en Miraflores",
+    "ubicacion": "Miraflores, Lima",
+    "descripcion": "Departamento con vista al mar, 3 dormitorios.",
+    "precio": 3800,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 3,
+    "titulo": "Habitación amoblada en San Borja",
+    "ubicacion": "San Borja, Lima",
+    "descripcion": "Ideal para estudiantes o profesionales.",
+    "precio": 850,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 4,
+    "titulo": "Casa de 2 pisos en La Molina",
+    "ubicacion": "La Molina, Lima",
+    "descripcion": "Casa con piscina, 4 dormitorios y jardín.",
+    "precio": 670000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "vendida",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 5,
+    "titulo": "Mini departamento en Barranco",
+    "ubicacion": "Barranco, Lima",
+    "descripcion": "Pequeño pero acogedor, cerca a zona bohemia.",
+    "precio": 1600,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "alquilada",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 6,
+    "titulo": "Habitación con baño privado en Jesús María",
+    "ubicacion": "Jesús María, Lima",
+    "descripcion": "Incluye servicios, zona segura.",
+    "precio": 1000,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 7,
+    "titulo": "Departamento en Magdalena del Mar",
+    "ubicacion": "Magdalena, Lima",
+    "descripcion": "Cerca al malecón, 2 dormitorios.",
+    "precio": 3000,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "alquilada",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 8,
+    "titulo": "Casa de playa en Asia",
+    "ubicacion": "Asia, Lima",
+    "descripcion": "Ideal para temporada de verano.",
+    "precio": 780000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "disponible",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 9,
+    "titulo": "Habitación en San Miguel",
+    "ubicacion": "San Miguel, Lima",
+    "descripcion": "Amoblada y cerca a centros comerciales.",
+    "precio": 950,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 10,
+    "titulo": "Departamento en Pueblo Libre",
+    "ubicacion": "Pueblo Libre, Lima",
+    "descripcion": "Amplio, con balcón y áreas comunes.",
+    "precio": 2200,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 11,
+    "titulo": "Casa rústica en Chaclacayo",
+    "ubicacion": "Chaclacayo, Lima",
+    "descripcion": "Estilo campestre, amplio terreno.",
+    "precio": 350000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "vendida",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 12,
+    "titulo": "Departamento en Lince",
+    "ubicacion": "Lince, Lima",
+    "descripcion": "Moderno, con cocina americana.",
+    "precio": 2900,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 13,
+    "titulo": "Habitación con entrada independiente en Breña",
+    "ubicacion": "Breña, Lima",
+    "descripcion": "Zona tranquila, acceso rápido al centro.",
+    "precio": 750,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 14,
+    "titulo": "Casa elegante en San Isidro",
+    "ubicacion": "San Isidro, Lima",
+    "descripcion": "Con acabados de lujo y amplio jardín.",
+    "precio": 980000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "disponible",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 15,
+    "titulo": "Departamento en Jesús María",
+    "ubicacion": "Jesús María, Lima",
+    "descripcion": "Vista al parque, 3 habitaciones.",
+    "precio": 3500,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "alquilada",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 16,
+    "titulo": "Habitación en Surquillo",
+    "ubicacion": "Surquillo, Lima",
+    "descripcion": "Amoblada, con acceso a cocina compartida.",
+    "precio": 800,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 17,
+    "titulo": "Casa con piscina en Cieneguilla",
+    "ubicacion": "Cieneguilla, Lima",
+    "descripcion": "Perfecta para descanso o eventos.",
+    "precio": 630000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "disponible",
+    "imagenUrl": "/casa.jpg"
+  },
+  {
+    "id": 18,
+    "titulo": "Departamento dúplex en Miraflores",
+    "ubicacion": "Miraflores, Lima",
+    "descripcion": "Vista panorámica, 2 niveles.",
+    "precio": 4900,
+    "tipo": "Departamento",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/departamento.jpg"
+  },
+  {
+    "id": 19,
+    "titulo": "Habitación para estudiante en La Victoria",
+    "ubicacion": "La Victoria, Lima",
+    "descripcion": "Cerca a universidades y transporte público.",
+    "precio": 600,
+    "tipo": "Habitacion",
+    "modo": "alquiler",
+    "estado": "disponible",
+    "imagenUrl": "/habitacion.jpg"
+  },
+  {
+    "id": 20,
+    "titulo": "Casa frente al mar en Punta Hermosa",
+    "ubicacion": "Punta Hermosa, Lima",
+    "descripcion": "Ideal para vacacionar o vivir frente al mar.",
+    "precio": 1100000,
+    "tipo": "Casa",
+    "modo": "venta",
+    "estado": "vendida",
+    "imagenUrl": "/casa.jpg"
+  }
+]
